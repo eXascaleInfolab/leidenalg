@@ -54,7 +54,7 @@ class Optimiser
     Weight merge_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, MutableVertexPartition* constrained_partition);
     Weight merge_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, int consider_comms, MutableVertexPartition* constrained_partition);
 
-    inline void set_rng_seed(Id seed) { igraph_rng_seed(&rng, seed); };
+    inline void set_rng_seed(Id seed) noexcept { igraph_rng_seed(&rng, seed); };
 
     virtual ~Optimiser();
 

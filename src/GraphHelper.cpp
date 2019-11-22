@@ -266,6 +266,8 @@ Graph::Graph(igraph_t&& gr) noexcept: _graph(new igraph_t(move(gr))), _remove_gr
     _edge_weights.resize(ecount());
     EANV(_graph, "weight", const_cast<igraph_vector_t*>(
       igraph_vector_view(&weights, _edge_weights.data(), _edge_weights.size())));
+    assert(igraph_vector_size(&weights) == _edge_weights.size()
+      &&  "_edge_weights number is not synced with the number of edges");
     DELEA(_graph, "weight");
   } else set_default_edge_weight();
 //  {
@@ -372,9 +374,9 @@ int Graph::has_self_loops() const
     return has_self_loops;
 
   igraph_eit_t  eit;  // Edge iterator
-  const int err = igraph_eit_create(_graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
+  int err = igraph_eit_create(_graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
   if(err)
-    throw LeidenException("Edge iterator creation is failed: " + to_string(err));
+    throw LeidenException("Graph::owner() failed in igraph_eit_create(): " + to_string(err));
 
   while(!IGRAPH_EIT_NEXT(eit)) {
     const auto sid = IGRAPH_EIT_GET(eit);  // Source id
@@ -460,72 +462,70 @@ void Graph::set_self_weights()
 void Graph::init_admin()
 {
 
-  Id m = this->ecount();
+  const Id m = ecount();
 
   // Determine total weight in the graph.
-  this->_total_weight = 0.0;
+  _total_weight = 0.0;
   for (Id e = 0; e < m; e++)
-    this->_total_weight += this->edge_weight(e);
+    _total_weight += edge_weight(e);
 
   // Make sure to multiply by 2 for undirected graphs
   //if (!this->is_directed())
   //  this->_total_weight *= 2.0;
 
-  Id n = this->vcount();
+  const Id n = vcount();
 
-  this->_total_size = 0;
+  _total_size = 0;
   for (Id v = 0; v < n; v++)
-    this->_total_size += this->node_size(v);
+    _total_size += node_size(v);
 
   igraph_vector_t res;
 
   // Init weights vector
   igraph_vector_t weights;
-  assert(_edge_weights.size() == ecount() && "_edge_weights are not synced with the number of edges");
+  assert(_edge_weights.size() == m && "_edge_weights are not synced with the number of edges");
   igraph_vector_view(&weights, _edge_weights.data(), _edge_weights.size());
 
   // Strength IN
-  //_strength_in.clear();
-  _strength_in.resize(n);
-  igraph_strength(_graph,
-    const_cast<igraph_vector_t*>(igraph_vector_view(&res, _strength_in.data(), _strength_in.size())),
-    igraph_vss_all(), IGRAPH_IN, true, &weights);
-  assert(n == _strength_in.size() && "Unexpected number of incident vertices with defined strength in");
+  //igraph_vector_null(&res);  // Note: igraph_vector_null(&res) is performed automatically
+  int err = igraph_vector_init(&res, 0)
+    || igraph_strength(_graph, &res, igraph_vss_all(), IGRAPH_IN, true, &weights);
+  if(err)
+    throw LeidenException("init_admin(), igraph_strength() failed for in: " + to_string(err));
+  assert(igraph_vector_size(&res) == n && "Unexpected number of incident vertices with defined strength in");
+  _strength_in.assign(igraph_vector_e_ptr(&res, 0), igraph_vector_e_ptr(&res, n));
 
   // Strength OUT
-  _strength_out.resize(n);
   // Calculcate strength
-  igraph_strength(_graph,
-    const_cast<igraph_vector_t*>(igraph_vector_view(&res, _strength_out.data(), _strength_out.size())),
-    igraph_vss_all(), IGRAPH_OUT, true, &weights);
-  assert(n == _strength_out.size() && "Unexpected number of incident vertices with defined strength out");
+  err = igraph_strength(_graph, &res, igraph_vss_all(), IGRAPH_OUT, true, &weights);
+  if(err)
+    throw LeidenException("init_admin(), igraph_strength() failed for out: " + to_string(err));
+  assert(igraph_vector_size(&res) == n && "Unexpected number of edges in strength out");
+  _strength_out.assign(igraph_vector_e_ptr(&res, 0), igraph_vector_e_ptr(&res, n));
 
   // Degree IN
-  _degree_in.resize(n);
-  static_assert(sizeof(remove_pointer_t<decltype(_degree_in.data())>) == sizeof(igraph_real_t),
-    "_degree_in should have compatible type of elements with igraph_real_t");
-  igraph_degree(_graph, const_cast<igraph_vector_t*>(igraph_vector_view(&res,
-      reinterpret_cast<igraph_real_t*>(_degree_in.data()), _degree_in.size())),
-    igraph_vss_all(), IGRAPH_IN, true);
-  assert(n == _degree_in.size() && "Unexpected number of incident vertices with defined degree in");
+  //igraph_vector_null(&res);  // Note: igraph_vector_null(&res) is performed automatically
+  err = igraph_degree(_graph, &res, igraph_vss_all(), IGRAPH_IN, true);
+  if(err)
+    throw LeidenException("init_admin(), igraph_degree() failed for in: " + to_string(err));
+  assert(igraph_vector_size(&res) == n && "Unexpected number of edges in degree in");
+  _degree_in.assign(igraph_vector_e_ptr(&res, 0), igraph_vector_e_ptr(&res, n));
 
   // Degree OUT
-  _degree_out.resize(n);
-  static_assert(sizeof(remove_pointer_t<decltype(_degree_out.data())>) == sizeof(igraph_real_t),
-    "_degree_out should have compatible type of elements with igraph_real_t");
-  igraph_degree(_graph, const_cast<igraph_vector_t*>(igraph_vector_view(&res,
-      reinterpret_cast<igraph_real_t*>(_degree_out.data()), _degree_out.size())),
-    igraph_vss_all(), IGRAPH_OUT, true);
-  assert(n == _degree_out.size() && "Unexpected number of incident vertices with defined degree out");
+  err = igraph_degree(_graph, &res, igraph_vss_all(), IGRAPH_OUT, true);
+  if(err)
+    throw LeidenException("init_admin(), igraph_degree() failed for out: " + to_string(err));
+  assert(igraph_vector_size(&res) == n && "Unexpected number of edges in degree out");
+  _degree_out.assign(igraph_vector_e_ptr(&res, 0), igraph_vector_e_ptr(&res, n));
 
   // Degree ALL
-  _degree_all.resize(n);
-  static_assert(sizeof(remove_pointer_t<decltype(_degree_all.data())>) == sizeof(igraph_real_t),
-    "_degree_all should have compatible type of elements with igraph_real_t");
-  igraph_degree(_graph, const_cast<igraph_vector_t*>(igraph_vector_view(&res,
-       reinterpret_cast<igraph_real_t*>(_degree_all.data()), _degree_all.size())),
-    igraph_vss_all(), IGRAPH_ALL, true);
-  assert(n == _degree_all.size() && "Unexpected number of incident vertices with defined degree");
+  err = igraph_degree(_graph, &res, igraph_vss_all(), IGRAPH_ALL, true);
+  if(err)
+    throw LeidenException("init_admin(), igraph_degree() failed for all: " + to_string(err));
+  assert(igraph_vector_size(&res) == n && "Unexpected number of edges in degree all");
+  _degree_all.assign(igraph_vector_e_ptr(&res, 0), igraph_vector_e_ptr(&res, n));
+
+  igraph_vector_destroy(&res);
 
   // Calculate density;
   Weight w = total_weight();
@@ -559,10 +559,6 @@ void Graph::cache_neighbour_edges(Id v, igraph_neimode_t mode) const noexcept
   #ifdef DEBUG
     cerr << "void Graph::cache_neighbour_edges(" << v << ", " << mode << ");" << endl;
   #endif
-  Id degree = this->degree(v, mode);
-  #ifdef DEBUG
-    cerr << "Degree: " << degree << endl;
-  #endif
 
   vector<Id>* _cached_neigh_edges = nullptr;
   switch (mode)
@@ -580,15 +576,19 @@ void Graph::cache_neighbour_edges(Id v, igraph_neimode_t mode) const noexcept
       this->_current_node_cache_neigh_edges_all = v;
       _cached_neigh_edges = &_cached_neigh_edges_all;
   }
-  _cached_neigh_edges->resize(degree);
   igraph_vector_t incident_edges;
-  static_assert(sizeof(remove_pointer_t<decltype(_cached_neigh_edges->data())>) == sizeof(igraph_real_t),
-    "_cached_neigh_edges should have compatible type of elements with igraph_real_t");
-  igraph_incident(_graph, const_cast<igraph_vector_t*>(igraph_vector_view(&incident_edges,
-    reinterpret_cast<igraph_real_t*>(_cached_neigh_edges->data()), _cached_neigh_edges->size())), v, mode);
-  assert(degree == _cached_neigh_edges->size() && "Unexpected number of incident edges");
+  int err = igraph_vector_init(&incident_edges, 0)
+    || igraph_incident(_graph, &incident_edges, v, mode);
+  if(err)
+    throw LeidenException("cache_neighbour_edges(), incident_edges failed: " + to_string(err));
+  assert(degree(v, mode) == igraph_vector_size(&incident_edges)
+    && "cache_neighbour_edges(), incident_edges are not synchronized with the vertex degree");
+  _cached_neigh_edges->assign(igraph_vector_e_ptr(&incident_edges, 0)
+    , igraph_vector_e_ptr(&incident_edges, igraph_vector_size(&incident_edges)));
+  igraph_vector_destroy(&incident_edges);
 
   #ifdef DEBUG
+    cerr << "Degree: " << degree(v, mode) << endl;
     cerr << "Number of edges: " << _cached_neigh_edges->size() << endl;
     cerr << "exit void Graph::cache_neighbour_edges(" << v << ", " << mode << ");" << endl;
   #endif
@@ -636,10 +636,6 @@ void Graph::cache_neighbours(Id v, igraph_neimode_t mode) const noexcept
   #ifdef DEBUG
     cerr << "void Graph::cache_neighbours(" << v << ", " << mode << ");" << endl;
   #endif
-  Id degree = this->degree(v, mode);
-  #ifdef DEBUG
-    cerr << "Degree: " << degree << endl;
-  #endif
 
   vector<Id>* _cached_neighs = nullptr;
   switch (mode)
@@ -657,15 +653,19 @@ void Graph::cache_neighbours(Id v, igraph_neimode_t mode) const noexcept
       this->_current_node_cache_neigh_all = v;
       _cached_neighs = &(this->_cached_neighs_all);
   }
-  _cached_neighs->resize(degree);
   igraph_vector_t neighbours;
-  static_assert(sizeof(remove_pointer_t<decltype(_cached_neighs->data())>) == sizeof(igraph_real_t),
-    "_cached_neighs should have compatible type of elements with igraph_real_t");
-  igraph_neighbors(_graph, const_cast<igraph_vector_t*>(igraph_vector_view(&neighbours
-    , reinterpret_cast<igraph_real_t*>(_cached_neighs->data()), _cached_neighs->size())), v, mode);
-  assert(degree == _cached_neighs->size() && "Unexpected number of neighbors");
+  int err = igraph_vector_init(&neighbours, 0)
+    || igraph_neighbors(_graph, &neighbours, v, mode);
+  if(err)
+    throw LeidenException("get_endpoints(), neighbours failed: " + to_string(err));
+  assert(degree(v, mode) == igraph_vector_size(&neighbours)
+    && "cache_neighbours(), neighbours are not synchronized with the vertex degree");
+  _cached_neighs->assign(igraph_vector_e_ptr(&neighbours, 0)
+    , igraph_vector_e_ptr(&neighbours, igraph_vector_size(&neighbours)));
+  igraph_vector_destroy(&neighbours);
 
   #ifdef DEBUG
+    cerr << "Degree: " << >degree(v, mode) << endl;
     cerr << "Number of edges: " << _cached_neighs->size() << endl;
     cerr << "exit void Graph::cache_neighbours(" << v << ", " << mode << ");" << endl;
   #endif
@@ -811,7 +811,7 @@ Graph* Graph::collapse_graph(MutableVertexPartition* partition) const
   for (Id e = 0; e < m; e++)
   {
     Weight w = this->edge_weight(e);
-    igraph_edge(this->_graph, e, &v, &u);
+    igraph_edge(_graph, e, &v, &u);
     Id v_comm = partition->membership((Id)v);
     Id u_comm = partition->membership((Id)u);
     if (collapsed_edge_weights[v_comm].count(u_comm) > 0)
@@ -834,7 +834,9 @@ Graph* Graph::collapse_graph(MutableVertexPartition* partition) const
   vector<Weight> collapsed_weights(m_collapsed, 0.0);
   Weight total_collapsed_weight = 0.0;
 
-  igraph_vector_init(&edges, 2*m_collapsed); // Vector or edges with edges (edge[0], edge[1]), (edge[2], edge[3]), etc...
+  int err = igraph_vector_init(&edges, 2*m_collapsed); // Vector or edges with edges (edge[0], edge[1]), (edge[2], edge[3]), etc...
+  if(err)
+    throw LeidenException("collapse_graph(), igraph_vector_init() failed: " + to_string(err));
 
   Id e_idx = 0;
   for (Id v = 0; v < n_collapsed; v++)
@@ -858,7 +860,9 @@ Graph* Graph::collapse_graph(MutableVertexPartition* partition) const
 
   // Create graph based on edges
   igraph_t* graph = new igraph_t();
-  igraph_create(graph, &edges, n_collapsed, this->is_directed());
+  err = igraph_create(graph, &edges, n_collapsed, this->is_directed());
+  if(err)
+    throw LeidenException("collapse_graph(), igraph_create() failed: " + to_string(err));
   igraph_vector_destroy(&edges);
 
   if ((Id) igraph_vcount(graph) != partition->n_communities())

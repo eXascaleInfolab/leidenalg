@@ -5,7 +5,8 @@
 
   Be sure to call
 
-  igraph_i_set_attribute_table(&igraph_cattribute_table);
+  if(!igraph_has_attribute_table())
+    igraph_i_set_attribute_table(&igraph_cattribute_table);
 
   before using this package, otherwise the attribute handling
   will not be dealt with correctly.
@@ -25,8 +26,10 @@ Optimiser::Optimiser(): consider_comms(Optimiser::ALL_NEIGH_COMMS),
   optimise_routine(Optimiser::MOVE_NODES), refine_routine(Optimiser::MERGE_NODES),
   consider_empty_community(true)
 {
-  igraph_rng_init(&rng, &igraph_rngtype_mt19937);
-  igraph_rng_seed(&rng, rand());
+  const int err = igraph_rng_init(&rng, &igraph_rngtype_mt19937)
+    || igraph_rng_seed(&rng, rand());
+  if(err)
+    throw LeidenException("Optimiser(), rand initialization failed: " + std::to_string(err));
 }
 
 Optimiser::~Optimiser()

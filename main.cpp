@@ -34,19 +34,19 @@ using Nodes = vector<Id>;  // Note: to store them as igraph node vertex attribut
 //using ExternIds = vector<Id>  extids;
 
 
-//! \brief Igraph vector view for custom types
-template<typename BASE>
-const igraph_vector_t* igraph_vector_view(const igraph_vector_t *v, const BASE *data, Id length) noexcept
-{
-	static_assert(sizeof(igraph_real_t) == sizeof(BASE), "BASE type should be compatible with the igraph_real_t");
-	assert(data && "Allocated data array is expected");
-	auto vv = const_cast<igraph_vector_t*>(v);
-
-	vv->stor_begin = reinterpret_cast<igraph_real_t*>(const_cast<BASE*>(data));
-	vv->stor_end = reinterpret_cast<igraph_real_t*>(const_cast<BASE*>(data)) + length;
-	vv->end = vv->stor_end;
-	return v;
-}
+////! \brief Igraph vector view for custom types
+//template<typename BASE>
+//const igraph_vector_t* igraph_vector_view(const igraph_vector_t *v, const BASE *data, Id length) noexcept
+//{
+//	static_assert(sizeof(igraph_real_t) == sizeof(BASE), "BASE type should be compatible with the igraph_real_t");
+//	assert(data && "Allocated data array is expected");
+//	auto vv = const_cast<igraph_vector_t*>(v);
+//
+//	vv->stor_begin = reinterpret_cast<igraph_real_t*>(const_cast<BASE*>(data));
+//	vv->stor_end = reinterpret_cast<igraph_real_t*>(const_cast<BASE*>(data)) + length;
+//	vv->end = vv->stor_end;
+//	return v;
+//}
 
 
 //! \brief Fetch existing of create a new node by the external id
@@ -230,6 +230,10 @@ igraph_t loadGraphNSL(string inpfile, int8_t directed=-1)
 		&& "Link weights should be synchronized with the links");
 
 	// Initialize the graph
+	// Turn on attributes if any
+	const bool nodeAttrs = !nodes.empty() && nodes.back() > nodes.size() - 1;
+	if((nodeAttrs || !weights.empty()) && !igraph_has_attribute_table())
+		igraph_i_set_attribute_table(&igraph_cattribute_table);
 	igraph_t  graph;
 	auto err = igraph_empty(&graph, nodes.size(), directed);
 	if(err)
@@ -237,13 +241,26 @@ igraph_t loadGraphNSL(string inpfile, int8_t directed=-1)
 
 	igraph_vector_t  igvec;  // Igraph vector view
 	// Save external (original) node ids if they are not the same as the internal ids
-	if(!nodes.empty() && nodes.back() == nodes.size() - 1) {
-		err = SETVANV(&graph, "name", igraph_vector_view(&igvec, nodes.data(), nodes.size()));
+	if(nodeAttrs) {
+		static_assert(sizeof(igraph_real_t) == sizeof(nodes[0])
+			, "Node id type should be compatible with the igraph_real_t");
+		err = SETVANV(&graph, "name", igraph_vector_view(&igvec
+			, reinterpret_cast<const igraph_real_t*>(nodes.data()), nodes.size()));
 		if(err)
 			throw LeidenException("Graph weights node names (ext ids) assignment is failed: " + to_string(err));
 	}
 	// Fill the graph links
-	err = igraph_add_edges(&graph, igraph_vector_view(&igvec, links.data(), links.size()), nullptr);
+	//err = igraph_add_edges(&graph, igraph_vector_view(&igvec, links.data(), links.size()), nullptr);
+	//if(err)
+	//	throw LeidenException("Graph links construction failed: " + to_string(err));
+	err = igraph_vector_init(&igvec, links.size());
+	if(err)
+		throw LeidenException("Graph links construction failed: " + to_string(err));
+	for(Id i = 0; i < links.size(); ++i)
+		VECTOR(igvec)[i] = links[i];
+	err = igraph_add_edges(&graph, &igvec, nullptr);
+	igraph_vector_destroy(&igvec);
+
 	if(err)
 		throw LeidenException("Graph links construction failed: " + to_string(err));
 	// Fill the graph weights

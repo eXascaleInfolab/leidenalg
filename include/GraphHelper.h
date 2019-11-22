@@ -6,6 +6,7 @@
 #include <set>
 #include <exception>
 #include <queue>
+#include <limits>
 
 //#ifdef DEBUG
 #include <iostream>
@@ -19,10 +20,13 @@ using std::pair;
 using std::set;
 using std::queue;
 using std::make_pair;
+using std::numeric_limits;
 
 
 //! Id type
-using Id = uint64_t;  // Note: 64 bit type is required for the efficient applicability with igraph_vector_t containers
+using Id = uint64_t;
+//static_assert(numeric_limits<Id>::digits10 <= numeric_limits<igraph_real_t>::digits10
+//  , "Id type should be fully representable with igraph_real_t");  // Required for the interoperability with igraph
 static_assert(sizeof(Id) == sizeof(igraph_real_t), "Id should be compatible with igraph_real_t");
 
 //! Link weight type
@@ -126,20 +130,20 @@ class Graph
 
     inline Id get_random_node(igraph_rng_t* rng) const noexcept
     {
-      return get_random_int(0, this->vcount() - 1, rng);
+      return get_random_int(0, vcount() - 1, rng);
     };
 
-    inline const igraph_t* get_igraph() const noexcept  { return this->_graph; };
-    //inline igraph_t* get_igraph() noexcept  { return this->_graph; };
+    inline const igraph_t* get_igraph() const noexcept  { return _graph; };
+    //inline igraph_t* get_igraph() noexcept  { return _graph; };
 
-    inline Id vcount() const noexcept  { return igraph_vcount(this->_graph); };
-    inline Id ecount() const noexcept { return igraph_ecount(this->_graph); };
-    inline Weight total_weight() const noexcept { return this->_total_weight; };
-    inline Id total_size() const noexcept { return this->_total_size; };
-    inline int is_directed() const noexcept { return igraph_is_directed(this->_graph); };
-    inline Weight density() const noexcept { return this->_density; };
-    inline int correct_self_loops() const noexcept { return this->_correct_self_loops; };
-    inline int is_weighted() const noexcept { return this->_is_weighted; };
+    inline Id vcount() const noexcept  { return igraph_vcount(_graph); };
+    inline Id ecount() const noexcept { return igraph_ecount(_graph); };
+    inline Weight total_weight() const noexcept { return _total_weight; };
+    inline Id total_size() const noexcept { return _total_size; };
+    inline int is_directed() const noexcept { return igraph_is_directed(_graph); };
+    inline Weight density() const noexcept { return _density; };
+    inline int correct_self_loops() const noexcept { return _correct_self_loops; };
+    inline int is_weighted() const noexcept { return _is_weighted; };
 
     // Get weight of edge based on attribute (or 1.0 if there is none).
     inline Weight edge_weight(Id e) const
@@ -149,17 +153,17 @@ class Graph
     {
       #ifdef DEBUG
       //return _edge_weights.at(e);
-      if (e > this->_edge_weights.size())
+      if (e > _edge_weights.size())
         throw LeidenException("Edges outside of range of edge weights.");
       #endif
-      return this->_edge_weights[e];
+      return _edge_weights[e];
       //return EAN(this, "weight", e);  // Note: igraph attributes processing is relatively slow
     };
 
     inline vector<Id> edge(Id e) const noexcept
     {
       igraph_integer_t v1, v2;
-      igraph_edge(this->_graph, e, &v1, &v2);
+      igraph_edge(_graph, e, &v1, &v2);
       vector<Id> edge(2);
       edge[0] = v1; edge[1] = v2;
       return edge;
@@ -167,20 +171,20 @@ class Graph
 
     // Get size of node based on attribute (or 1.0 if there is none).
     inline Id node_size(Id v) const noexcept
-    { return this->_node_sizes[v]; };
+    { return _node_sizes[v]; };
 
     // Get self weight of node based on attribute (or set to 0.0 if there is none)
     inline Weight node_self_weight(Id v) const noexcept
-    { return this->_node_self_weights[v]; };
+    { return _node_self_weights[v]; };
 
     inline Id degree(Id v, igraph_neimode_t mode) const
     {
       if (mode == IGRAPH_IN)
-        return this->_degree_in[v];
+        return _degree_in[v];
       else if (mode == IGRAPH_OUT)
-        return this->_degree_out[v];
+        return _degree_out[v];
       else if (mode == IGRAPH_ALL)
-        return this->_degree_all[v];
+        return _degree_all[v];
       else
         throw LeidenException("Incorrect mode specified.");
     };
@@ -188,9 +192,9 @@ class Graph
     inline Weight strength(Id v, igraph_neimode_t mode) const
     {
       if (mode == IGRAPH_IN)
-        return this->_strength_in[v];
+        return _strength_in[v];
       else if (mode == IGRAPH_OUT)
-        return this->_strength_out[v];
+        return _strength_out[v];
       else
         throw LeidenException("Incorrect mode specified.");
     };
