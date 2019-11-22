@@ -14,12 +14,12 @@ SignificanceVertexPartition::SignificanceVertexPartition(const Graph* graph)
   : MutableVertexPartition(graph)
 {}
 
-SignificanceVertexPartition* SignificanceVertexPartition::create(const Graph* graph)
+SignificanceVertexPartition* SignificanceVertexPartition::create(const Graph* graph) const
 {
   return new SignificanceVertexPartition(graph);
 }
 
-SignificanceVertexPartition* SignificanceVertexPartition::create(const Graph* graph, vector<Id> const& membership)
+SignificanceVertexPartition* SignificanceVertexPartition::create(const Graph* graph, vector<Id> const& membership) const
 {
   return new SignificanceVertexPartition(graph, membership);
 }

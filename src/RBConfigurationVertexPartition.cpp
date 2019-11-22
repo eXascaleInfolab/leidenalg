@@ -22,12 +22,12 @@ RBConfigurationVertexPartition::RBConfigurationVertexPartition(const Graph* grap
 RBConfigurationVertexPartition::~RBConfigurationVertexPartition()
 {}
 
-RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(const Graph* graph)
+RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(const Graph* graph) const
 {
   return new RBConfigurationVertexPartition(graph, this->resolution_parameter);
 }
 
-RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(const Graph* graph, vector<Id> const& membership)
+RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(const Graph* graph, vector<Id> const& membership) const
 {
   return new RBConfigurationVertexPartition(graph, membership, this->resolution_parameter);
 }

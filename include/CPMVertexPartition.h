@@ -15,8 +15,8 @@ class CPMVertexPartition : public LinearResolutionParameterVertexPartition
       Weight resolution_parameter);
     CPMVertexPartition(const Graph* graph);
     virtual ~CPMVertexPartition();
-    virtual CPMVertexPartition* create(const Graph* graph);
-    virtual CPMVertexPartition* create(const Graph* graph, vector<Id> const& membership);
+    virtual CPMVertexPartition* create(const Graph* graph) const;
+    virtual CPMVertexPartition* create(const Graph* graph, vector<Id> const& membership) const;
 
     virtual Weight diff_move(Id v, Id new_comm);
     virtual Weight quality(Weight resolution_parameter) const;

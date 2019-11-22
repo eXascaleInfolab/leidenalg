@@ -328,7 +328,7 @@ class BuildConfiguration(object):
         self.include_dirs = []
         self.library_dirs = []
         self.libraries = []
-        self.extra_compile_args = []
+        self.extra_compile_args = ["-std=c++14", "-Weffc++"]
         self.extra_link_args = []
         self.extra_objects = []
         self.show_progress_bar = True

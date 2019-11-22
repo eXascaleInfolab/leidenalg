@@ -13,8 +13,8 @@ class RBConfigurationVertexPartition : public LinearResolutionParameterVertexPar
     RBConfigurationVertexPartition(const Graph* graph, Weight resolution_parameter);
     RBConfigurationVertexPartition(const Graph* graph);
     virtual ~RBConfigurationVertexPartition();
-    virtual RBConfigurationVertexPartition* create(const Graph* graph);
-    virtual RBConfigurationVertexPartition* create(const Graph* graph, vector<Id> const& membership);
+    virtual RBConfigurationVertexPartition* create(const Graph* graph) const;
+    virtual RBConfigurationVertexPartition* create(const Graph* graph, vector<Id> const& membership) const;
 
     virtual Weight diff_move(Id v, Id new_comm);
     virtual Weight quality(Weight resolution_parameter) const;

@@ -102,6 +102,13 @@ class Graph
     Graph& operator=(const Graph&)=delete;
     Graph& operator=(Graph&& other) noexcept;
 
+    //! \brief Attempt to update the owner partition of the graph, which destroys it on self-destruction
+    //!
+    //! \param owner MutableVertexPartition*  - owner partition candidate to be set
+    //! \return MutableVertexPartition*  - the actual owner of the graph
+    const MutableVertexPartition* owner(const MutableVertexPartition* owner) noexcept;
+    const MutableVertexPartition* owner() const noexcept  { return _owner; }
+
     int has_self_loops() const;
     //! The maximal number of edges
     Id possible_edges() const noexcept;
@@ -189,10 +196,13 @@ class Graph
     };
 
   private:
-    igraph_t* _graph;
+    igraph_t  *_graph;
 
   //protected:
-    int _remove_graph;
+    //! Whether to remove _graph on destruction
+    bool  _remove_graph;
+    //! Owner partition of this Graph to be destroyed with it
+    const MutableVertexPartition  *_owner;
 
     // Utility variables to easily access the strength of each node
     vector<Weight> _strength_in;
@@ -234,9 +244,4 @@ class Graph
 
 };
 
-// We need this ugly way to include the MutableVertexPartition
-// to overcome a circular linkage problem.
-#include "MutableVertexPartition.h"
-
 #endif // GRAPHHELPER_INCLUDED
-

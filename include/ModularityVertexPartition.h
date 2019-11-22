@@ -10,8 +10,8 @@ class ModularityVertexPartition: public MutableVertexPartition
     ModularityVertexPartition(const Graph* graph, vector<Id> const& membership);
     ModularityVertexPartition(const Graph* graph);
     virtual ~ModularityVertexPartition();
-    virtual ModularityVertexPartition* create(const Graph* graph);
-    virtual ModularityVertexPartition* create(const Graph* graph, vector<Id> const& membership);
+    virtual ModularityVertexPartition* create(const Graph* graph) const;
+    virtual ModularityVertexPartition* create(const Graph* graph, vector<Id> const& membership) const;
 
     virtual Weight diff_move(Id v, Id new_comm);
     virtual Weight quality() const;

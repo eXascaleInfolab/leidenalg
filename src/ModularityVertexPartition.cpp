@@ -16,12 +16,12 @@ ModularityVertexPartition::ModularityVertexPartition(const Graph* graph): Mutabl
 ModularityVertexPartition::~ModularityVertexPartition()
 {}
 
-ModularityVertexPartition* ModularityVertexPartition::create(const Graph* graph)
+ModularityVertexPartition* ModularityVertexPartition::create(const Graph* graph) const
 {
   return new ModularityVertexPartition(graph);
 }
 
-ModularityVertexPartition* ModularityVertexPartition::create(const Graph* graph, vector<Id> const& membership)
+ModularityVertexPartition* ModularityVertexPartition::create(const Graph* graph, vector<Id> const& membership) const
 {
   return new ModularityVertexPartition(graph, membership);
 }

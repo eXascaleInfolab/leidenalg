@@ -1,4 +1,8 @@
+//#include <cmath>  // isnan
 #include "python_optimiser_interface.h"
+
+using std::isnan;
+
 
   PyObject* capsule_Optimiser(Optimiser* optimiser)
   {
@@ -24,10 +28,10 @@ extern "C"
 
   PyObject* _new_Optimiser(PyObject *self, PyObject *args)
   {
-    if (args != NULL)
+    if (args != nullptr)
     {
       PyErr_BadArgument();
-      return NULL;
+      return nullptr;
     }
 
     Optimiser* optimiser = new Optimiser();
@@ -37,10 +41,10 @@ extern "C"
 
   PyObject* _Optimiser_optimise_partition(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    PyObject* py_partition = NULL;
+    PyObject* py_optimiser = nullptr;
+    PyObject* py_partition = nullptr;
 
-    static char* kwlist[] = {"optimiser", "partition", NULL};
+    static char* kwlist[] = {"optimiser", "partition", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -48,7 +52,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "OO", kwlist,
                                      &py_optimiser, &py_partition))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "optimise_partition(" << py_partition << ");" << endl;
@@ -78,25 +82,25 @@ extern "C"
     catch (std::exception e)
     {
       PyErr_SetString(PyExc_ValueError, e.what());
-      return NULL;
+      return nullptr;
     }
     return PyFloat_FromDouble(q);
   }
 
   PyObject* _Optimiser_optimise_partition_multiplex(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    PyObject* py_partitions = NULL;
-    PyObject* py_layer_weights = NULL;
+    PyObject* py_optimiser = nullptr;
+    PyObject* py_partitions = nullptr;
+    PyObject* py_layer_weights = nullptr;
 
     if (!PyArg_ParseTuple(args, "OOO", &py_optimiser, &py_partitions, &py_layer_weights))
-        return NULL;
+        return nullptr;
 
     size_t nb_partitions = PyList_Size(py_partitions);
     if (nb_partitions != PyList_Size(py_layer_weights))
     {
       PyErr_SetString(PyExc_ValueError, "Number of layer weights does not equal the number of partitions");
-      return NULL;
+      return nullptr;
     }
 
     #ifdef DEBUG
@@ -131,11 +135,11 @@ extern "C"
       else
       {
         PyErr_SetString(PyExc_TypeError, "Expected floating value for layer weight.");
-        return NULL;
+        return nullptr;
       }
 
       if (isnan(layer_weights[layer]))
-        throw Exception("Cannot accept NaN weights.");
+        throw LeidenException("Cannot accept NaN weights.");
     }
 
     #ifdef DEBUG
@@ -154,18 +158,18 @@ extern "C"
     catch (std::exception e)
     {
       PyErr_SetString(PyExc_ValueError, e.what());
-      return NULL;
+      return nullptr;
     }
     return PyFloat_FromDouble(q);
   }
 
   PyObject* _Optimiser_move_nodes(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    PyObject* py_partition = NULL;
+    PyObject* py_optimiser = nullptr;
+    PyObject* py_partition = nullptr;
     int consider_comms = -1;
 
-    static char* kwlist[] = {"optimiser", "partition", "consider_comms", NULL};
+    static char* kwlist[] = {"optimiser", "partition", "consider_comms", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -173,7 +177,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "OO|i", kwlist,
                                      &py_optimiser, &py_partition, &consider_comms))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "optimise_partition(" << py_partition << ");" << endl;
@@ -206,18 +210,18 @@ extern "C"
     catch (std::exception e)
     {
       PyErr_SetString(PyExc_ValueError, e.what());
-      return NULL;
+      return nullptr;
     }
     return PyFloat_FromDouble(q);
   }
 
   PyObject* _Optimiser_merge_nodes(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    PyObject* py_partition = NULL;
+    PyObject* py_optimiser = nullptr;
+    PyObject* py_partition = nullptr;
     int consider_comms = -1;
 
-    static char* kwlist[] = {"optimiser", "partition", "consider_comms", NULL};
+    static char* kwlist[] = {"optimiser", "partition", "consider_comms", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -225,7 +229,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "OO|i", kwlist,
                                      &py_optimiser, &py_partition, &consider_comms))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "optimise_partition(" << py_partition << ");" << endl;
@@ -258,19 +262,19 @@ extern "C"
     catch (std::exception e)
     {
       PyErr_SetString(PyExc_ValueError, e.what());
-      return NULL;
+      return nullptr;
     }
     return PyFloat_FromDouble(q);
   }
 
   PyObject* _Optimiser_move_nodes_constrained(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    PyObject* py_partition = NULL;
-    PyObject* py_constrained_partition = NULL;
+    PyObject* py_optimiser = nullptr;
+    PyObject* py_partition = nullptr;
+    PyObject* py_constrained_partition = nullptr;
     int consider_comms = -1;
 
-    static char* kwlist[] = {"optimiser", "partition", "constrained_partition", "consider_comms", NULL};
+    static char* kwlist[] = {"optimiser", "partition", "constrained_partition", "consider_comms", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -278,7 +282,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "OOO|i", kwlist,
                                      &py_optimiser, &py_partition, &py_constrained_partition, &consider_comms))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "optimise_partition(" << py_partition << ");" << endl;
@@ -319,19 +323,19 @@ extern "C"
     catch (std::exception e)
     {
       PyErr_SetString(PyExc_ValueError, e.what());
-      return NULL;
+      return nullptr;
     }
     return PyFloat_FromDouble(q);
   }
 
   PyObject* _Optimiser_merge_nodes_constrained(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    PyObject* py_partition = NULL;
-    PyObject* py_constrained_partition = NULL;
+    PyObject* py_optimiser = nullptr;
+    PyObject* py_partition = nullptr;
+    PyObject* py_constrained_partition = nullptr;
     int consider_comms = -1;
 
-    static char* kwlist[] = {"optimiser", "partition", "constrained_partition", "consider_comms", NULL};
+    static char* kwlist[] = {"optimiser", "partition", "constrained_partition", "consider_comms", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -339,7 +343,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "OOO|i", kwlist,
                                      &py_optimiser, &py_partition, &py_constrained_partition, &consider_comms))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "optimise_partition(" << py_partition << ");" << endl;
@@ -380,16 +384,16 @@ extern "C"
     catch (std::exception e)
     {
       PyErr_SetString(PyExc_ValueError, e.what());
-      return NULL;
+      return nullptr;
     }
     return PyFloat_FromDouble(q);
   }
 
   PyObject* _Optimiser_set_consider_comms(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
+    PyObject* py_optimiser = nullptr;
     int consider_comms = Optimiser::ALL_NEIGH_COMMS;
-    static char* kwlist[] = {"optimiser", "consider_comms", NULL};
+    static char* kwlist[] = {"optimiser", "consider_comms", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -397,7 +401,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Oi", kwlist,
                                      &py_optimiser, &consider_comms))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "set_consider_comms(" << consider_comms << ");" << endl;
@@ -419,8 +423,8 @@ extern "C"
 
   PyObject* _Optimiser_get_consider_comms(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    static char* kwlist[] = {"optimiser", NULL};
+    PyObject* py_optimiser = nullptr;
+    static char* kwlist[] = {"optimiser", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -428,7 +432,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "O", kwlist,
                                      &py_optimiser))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "get_consider_comms();" << endl;
@@ -451,9 +455,9 @@ extern "C"
 
   PyObject* _Optimiser_set_refine_consider_comms(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
+    PyObject* py_optimiser = nullptr;
     int refine_consider_comms = Optimiser::ALL_NEIGH_COMMS;
-    static char* kwlist[] = {"optimiser", "refine_consider_comms", NULL};
+    static char* kwlist[] = {"optimiser", "refine_consider_comms", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -461,7 +465,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Oi", kwlist,
                                      &py_optimiser, &refine_consider_comms))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "set_refine_consider_comms(" << refine_consider_comms << ");" << endl;
@@ -483,8 +487,8 @@ extern "C"
 
   PyObject* _Optimiser_get_refine_consider_comms(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    static char* kwlist[] = {"optimiser", NULL};
+    PyObject* py_optimiser = nullptr;
+    static char* kwlist[] = {"optimiser", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -492,7 +496,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "O", kwlist,
                                      &py_optimiser))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "get_refine_consider_comms();" << endl;
@@ -515,9 +519,9 @@ extern "C"
 
   PyObject* _Optimiser_set_optimise_routine(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
+    PyObject* py_optimiser = nullptr;
     int optimise_routine = Optimiser::ALL_NEIGH_COMMS;
-    static char* kwlist[] = {"optimiser", "optimise_routine", NULL};
+    static char* kwlist[] = {"optimiser", "optimise_routine", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -525,7 +529,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Oi", kwlist,
                                      &py_optimiser, &optimise_routine))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "set_optimise_routine(" << optimise_routine << ");" << endl;
@@ -547,8 +551,8 @@ extern "C"
 
   PyObject* _Optimiser_get_optimise_routine(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    static char* kwlist[] = {"optimiser", NULL};
+    PyObject* py_optimiser = nullptr;
+    static char* kwlist[] = {"optimiser", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -556,7 +560,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "O", kwlist,
                                      &py_optimiser))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "get_optimise_routine();" << endl;
@@ -579,9 +583,9 @@ extern "C"
 
   PyObject* _Optimiser_set_refine_routine(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
+    PyObject* py_optimiser = nullptr;
     int refine_routine = Optimiser::ALL_NEIGH_COMMS;
-    static char* kwlist[] = {"optimiser", "refine_routine", NULL};
+    static char* kwlist[] = {"optimiser", "refine_routine", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -589,7 +593,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Oi", kwlist,
                                      &py_optimiser, &refine_routine))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "set_refine_routine(" << refine_routine << ");" << endl;
@@ -611,8 +615,8 @@ extern "C"
 
   PyObject* _Optimiser_get_refine_routine(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    static char* kwlist[] = {"optimiser", NULL};
+    PyObject* py_optimiser = nullptr;
+    static char* kwlist[] = {"optimiser", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -620,7 +624,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "O", kwlist,
                                      &py_optimiser))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "get_refine_routine();" << endl;
@@ -643,9 +647,9 @@ extern "C"
 
   PyObject* _Optimiser_set_consider_empty_community(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
+    PyObject* py_optimiser = nullptr;
     int consider_empty_community = true;
-    static char* kwlist[] = {"optimiser", "consider_empty_community", NULL};
+    static char* kwlist[] = {"optimiser", "consider_empty_community", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -653,7 +657,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Oi", kwlist,
                                      &py_optimiser, &consider_empty_community))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "set_consider_empty_community(" << consider_empty_community << ");" << endl;
@@ -681,8 +685,8 @@ extern "C"
 
   PyObject* _Optimiser_get_consider_empty_community(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    static char* kwlist[] = {"optimiser", NULL};
+    PyObject* py_optimiser = nullptr;
+    static char* kwlist[] = {"optimiser", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -690,7 +694,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "O", kwlist,
                                      &py_optimiser))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "get_consider_empty_community();" << endl;
@@ -710,9 +714,9 @@ extern "C"
 
   PyObject* _Optimiser_set_refine_partition(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
+    PyObject* py_optimiser = nullptr;
     int refine_partition = false;
-    static char* kwlist[] = {"optimiser", "refine_partition", NULL};
+    static char* kwlist[] = {"optimiser", "refine_partition", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -720,7 +724,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Oi", kwlist,
                                      &py_optimiser, &refine_partition))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "set_refine_partition(" << refine_partition << ");" << endl;
@@ -742,8 +746,8 @@ extern "C"
 
   PyObject* _Optimiser_get_refine_partition(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
-    static char* kwlist[] = {"optimiser", NULL};
+    PyObject* py_optimiser = nullptr;
+    static char* kwlist[] = {"optimiser", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -751,7 +755,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "O", kwlist,
                                      &py_optimiser))
-        return NULL;
+        return nullptr;
 
     #ifdef DEBUG
       cerr << "get_refine_partition();" << endl;
@@ -770,9 +774,9 @@ extern "C"
 
   PyObject* _Optimiser_set_rng_seed(PyObject *self, PyObject *args, PyObject *keywds)
   {
-    PyObject* py_optimiser = NULL;
+    PyObject* py_optimiser = nullptr;
     int seed = 0;
-    static char* kwlist[] = {"optimiser", "seed", NULL};
+    static char* kwlist[] = {"optimiser", "seed", nullptr};
 
     #ifdef DEBUG
       cerr << "Parsing arguments..." << endl;
@@ -780,7 +784,7 @@ extern "C"
 
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Oi", kwlist,
                                     &py_optimiser, &seed))
-       return NULL;
+       return nullptr;
 
     #ifdef DEBUG
       cerr << "set_rng_seed(" << seed << ");" << endl;

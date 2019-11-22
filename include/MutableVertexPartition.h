@@ -61,8 +61,8 @@ class MutableVertexPartition
     virtual MutableVertexPartition& operator=(const MutableVertexPartition&)=delete;
     virtual MutableVertexPartition& operator=(MutableVertexPartition&& other) noexcept;
 
-    virtual MutableVertexPartition* create(const Graph* graph, vector<Id> const& membership);
-    virtual MutableVertexPartition* create(const Graph* graph);
+    virtual MutableVertexPartition* create(const Graph* graph) const;
+    virtual MutableVertexPartition* create(const Graph* graph, vector<Id> const& membership) const;
 
     inline Id membership(Id v) const noexcept { return this->_membership[v]; };
     inline vector<Id> const& membership() const noexcept { return this->_membership; };
@@ -117,10 +117,8 @@ class MutableVertexPartition
 
     vector<Id> _membership; // Membership vector, i.e. \sigma_i = c means that node i is in community c
 
+    // Note: the graph is automatically deleted on destruction if its owner is this partition
     const Graph* graph;
-    // By delegating the responsibility for deleting the graph to the partition,
-    // we no longer have to worry about deleting this graph.
-    int destructor_delete_graph;
 
     // Community size
     vector< Id > _csize;

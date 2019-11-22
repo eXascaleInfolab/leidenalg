@@ -1,35 +1,31 @@
 #include "CPMVertexPartition.h"
 
 CPMVertexPartition::CPMVertexPartition(const Graph* graph,
-      vector<Id> membership, Weight resolution_parameter) :
-        LinearResolutionParameterVertexPartition(graph,
-        membership, resolution_parameter)
-{ }
+  vector<Id> membership, Weight resolution_parameter)
+  : LinearResolutionParameterVertexPartition(graph, membership, resolution_parameter)
+{}
 
-CPMVertexPartition::CPMVertexPartition(const Graph* graph,
-      vector<Id> membership) :
-        LinearResolutionParameterVertexPartition(graph,
-        membership)
-{ }
+CPMVertexPartition::CPMVertexPartition(const Graph* graph, vector<Id> membership)
+  : LinearResolutionParameterVertexPartition(graph, membership)
+{}
 
-CPMVertexPartition::CPMVertexPartition(const Graph* graph,
-      Weight resolution_parameter) :
-        LinearResolutionParameterVertexPartition(graph, resolution_parameter)
-{ }
+CPMVertexPartition::CPMVertexPartition(const Graph* graph, Weight resolution_parameter)
+  : LinearResolutionParameterVertexPartition(graph, resolution_parameter)
+{}
 
-CPMVertexPartition::CPMVertexPartition(const Graph* graph) :
-        LinearResolutionParameterVertexPartition(graph)
-{ }
+CPMVertexPartition::CPMVertexPartition(const Graph* graph)
+  : LinearResolutionParameterVertexPartition(graph)
+{}
 
 CPMVertexPartition::~CPMVertexPartition()
-{ }
+{}
 
-CPMVertexPartition* CPMVertexPartition::create(const Graph* graph)
+CPMVertexPartition* CPMVertexPartition::create(const Graph* graph) const
 {
   return new CPMVertexPartition(graph, this->resolution_parameter);
 }
 
-CPMVertexPartition* CPMVertexPartition::create(const Graph* graph, vector<Id> const& membership)
+CPMVertexPartition* CPMVertexPartition::create(const Graph* graph, vector<Id> const& membership) const
 {
   return new CPMVertexPartition(graph, membership, this->resolution_parameter);
 }

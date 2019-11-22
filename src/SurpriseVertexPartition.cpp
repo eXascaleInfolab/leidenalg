@@ -10,14 +10,14 @@ SurpriseVertexPartition::SurpriseVertexPartition(const Graph* graph, vector<Id> 
 SurpriseVertexPartition::SurpriseVertexPartition(const Graph* graph): MutableVertexPartition(graph)
 {}
 
-SurpriseVertexPartition* SurpriseVertexPartition::create(const Graph* graph)
+SurpriseVertexPartition* SurpriseVertexPartition::create(const Graph* graph) const
 {
   return new SurpriseVertexPartition(graph);
 }
 
- SurpriseVertexPartition*  SurpriseVertexPartition::create(const Graph* graph, vector<Id> const& membership)
+SurpriseVertexPartition* SurpriseVertexPartition::create(const Graph* graph, vector<Id> const& membership) const
 {
-  return new  SurpriseVertexPartition(graph, membership);
+  return new SurpriseVertexPartition(graph, membership);
 }
 
 SurpriseVertexPartition::~SurpriseVertexPartition()

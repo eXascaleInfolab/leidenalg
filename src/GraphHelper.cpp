@@ -2,6 +2,7 @@
 #include <cassert>
 #include <type_traits>
 #include "GraphHelper.h"
+#include "MutableVertexPartition.h"
 
 #ifdef DEBUG
   using std::cerr;
@@ -80,14 +81,11 @@ Weight KLL(Weight q, Weight p)
   return KL;
 }
 
-Graph::Graph(igraph_t* graph,
-  vector<Weight> const& edge_weights,
-  vector<Id> const& node_sizes,
-  vector<Weight> const& node_self_weights, int correct_self_loops)
-{
-  this->_graph = graph;
-  this->_remove_graph = false;
 
+Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights
+  , vector<Id> const& node_sizes, vector<Weight> const& node_self_weights
+  , int correct_self_loops): _graph(graph), _remove_graph(false), _owner(nullptr)
+{
   if (edge_weights.size() != this->ecount())
     throw LeidenException("Edge weights vector inconsistent length with the edge count of the graph.");
   this->_edge_weights = edge_weights;
@@ -105,14 +103,10 @@ Graph::Graph(igraph_t* graph,
   this->init_admin();
 }
 
-Graph::Graph(igraph_t* graph,
-  vector<Weight> const& edge_weights,
-  vector<Id> const& node_sizes,
-  vector<Weight> const& node_self_weights)
+Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights
+  , vector<Id> const& node_sizes, vector<Weight> const& node_self_weights)
+  : _graph(graph), _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
-
   if (edge_weights.size() != this->ecount())
     throw LeidenException("Edge weights vector inconsistent length with the edge count of the graph.");
   this->_edge_weights = edge_weights;
@@ -128,13 +122,10 @@ Graph::Graph(igraph_t* graph,
   this->init_admin();
 }
 
-Graph::Graph(igraph_t* graph,
-  vector<Weight> const& edge_weights,
-  vector<Id> const& node_sizes, int correct_self_loops)
+Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights
+  , vector<Id> const& node_sizes, int correct_self_loops)
+  : _graph(graph), _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
-
   if (edge_weights.size() != this->ecount())
     throw LeidenException("Edge weights vector inconsistent length with the edge count of the graph.");
   this->_edge_weights = edge_weights;
@@ -149,12 +140,9 @@ Graph::Graph(igraph_t* graph,
   this->set_self_weights();
 }
 
-Graph::Graph(igraph_t* graph,
-  vector<Weight> const& edge_weights,
-  vector<Id> const& node_sizes)
+Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights
+  , vector<Id> const& node_sizes): _graph(graph), _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
   if (edge_weights.size() != this->ecount())
     throw LeidenException("Edge weights vector inconsistent length with the edge count of the graph.");
   this->_edge_weights = edge_weights;
@@ -171,9 +159,8 @@ Graph::Graph(igraph_t* graph,
 }
 
 Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights, int correct_self_loops)
+  : _graph(graph), _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
   this->_correct_self_loops = correct_self_loops;
   if (edge_weights.size() != this->ecount())
     throw LeidenException("Edge weights vector inconsistent length with the edge count of the graph.");
@@ -184,10 +171,9 @@ Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights, int correct_se
   this->set_self_weights();
 }
 
-Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights)
+Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights): _graph(graph)
+  , _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
   if (edge_weights.size() != this->ecount())
     throw LeidenException("Edge weights vector inconsistent length with the edge count of the graph.");
   this->_edge_weights = edge_weights;
@@ -201,9 +187,8 @@ Graph::Graph(igraph_t* graph, vector<Weight> const& edge_weights)
 }
 
 Graph::Graph(igraph_t* graph, vector<Id> const& node_sizes, int correct_self_loops)
+  : _graph(graph), _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
   this->_correct_self_loops = correct_self_loops;
 
   if (node_sizes.size() != this->vcount())
@@ -216,10 +201,9 @@ Graph::Graph(igraph_t* graph, vector<Id> const& node_sizes, int correct_self_loo
   this->set_self_weights();
 }
 
-Graph::Graph(igraph_t* graph, vector<Id> const& node_sizes)
+Graph::Graph(igraph_t* graph, vector<Id> const& node_sizes): _graph(graph)
+  , _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
   this->set_defaults();
   this->_is_weighted = false;
 
@@ -234,10 +218,9 @@ Graph::Graph(igraph_t* graph, vector<Id> const& node_sizes)
   this->set_self_weights();
 }
 
-Graph::Graph(igraph_t* graph, int correct_self_loops)
+Graph::Graph(igraph_t* graph, int correct_self_loops): _graph(graph)
+  , _remove_graph(false), _owner(nullptr)
 {
-  this->_graph = graph;
-  this->_remove_graph = false;
   this->set_defaults();
   this->_correct_self_loops = correct_self_loops;
   this->_is_weighted = false;
@@ -245,7 +228,7 @@ Graph::Graph(igraph_t* graph, int correct_self_loops)
   this->set_self_weights();
 }
 
-Graph::Graph(igraph_t* graph): _graph(graph), _remove_graph(false)
+Graph::Graph(igraph_t* graph): _graph(graph), _remove_graph(false), _owner(nullptr)
   , _correct_self_loops(has_self_loops())
 {
   this->set_defaults();
@@ -254,15 +237,15 @@ Graph::Graph(igraph_t* graph): _graph(graph), _remove_graph(false)
   this->set_self_weights();
 }
 
-Graph::Graph(): _graph(new igraph_t()), _remove_graph(true), _is_weighted(false)
-  , _correct_self_loops(false)
+Graph::Graph(): _graph(new igraph_t()), _remove_graph(true), _owner(nullptr)
+  , _is_weighted(false), _correct_self_loops(false)
 {
   set_defaults();
   init_admin();
   set_self_weights();
 }
 
-//Graph::Graph(bool clean) noexcept: _remove_graph(false), _remove_graph(false)
+//Graph::Graph(bool clean) noexcept: _graph(nullptr), _remove_graph(false)
 //  , _strength_in(), _strength_out(), _degree_in(), _degree_out(), _degree_all()
 //  , _edge_weights(), _node_sizes(), _node_self_weights()
 //  , _cached_neighs_from(), _current_node_cache_neigh_from()
@@ -275,7 +258,7 @@ Graph::Graph(): _graph(new igraph_t()), _remove_graph(true), _is_weighted(false)
 //{}
 
 Graph::Graph(igraph_t&& gr) noexcept: _graph(new igraph_t(move(gr))), _remove_graph(true)
-  , _is_weighted(igraph_cattribute_has_attr(_graph, IGRAPH_ATTRIBUTE_EDGE, "weight"))
+  , _owner(nullptr), _is_weighted(igraph_cattribute_has_attr(_graph, IGRAPH_ATTRIBUTE_EDGE, "weight"))
   , _correct_self_loops(has_self_loops())
 {
   if(_is_weighted) {
@@ -296,7 +279,7 @@ Graph::Graph(igraph_t&& gr) noexcept: _graph(new igraph_t(move(gr))), _remove_gr
   set_self_weights();
 }
 
-Graph::Graph(Graph&& other) noexcept: _graph(other._graph), _remove_graph(false)
+Graph::Graph(Graph&& other) noexcept: _graph(other._graph), _remove_graph(false), _owner(nullptr)
   , _strength_in(move(other._strength_in)), _strength_out(move(other._strength_out))
   , _degree_in(move(other._degree_in)), _degree_out(move(other._degree_out)), _degree_all(move(other._degree_all))
   , _edge_weights(move(other._edge_weights)), _node_sizes(move(other._node_sizes))
@@ -311,6 +294,7 @@ Graph::Graph(Graph&& other) noexcept: _graph(other._graph), _remove_graph(false)
   , _correct_self_loops(other._correct_self_loops), _density(other._density)
 {
   other._remove_graph = false;
+  //other._owner = nullptr;  // Note: other's owner should still be capable to release it's memory
   other._graph = nullptr;
   other._is_weighted = false;
   other._correct_self_loops = false;
@@ -335,6 +319,7 @@ Graph& Graph::operator=(Graph&& other) noexcept
   other._graph = nullptr;
   _remove_graph = other._remove_graph;
   other._remove_graph = false;
+  //other._owner = nullptr;  // Note: other's owner should still be capable to release it's memory
 
   _edge_weights = move(other._edge_weights);
   _is_weighted = other._is_weighted;
@@ -371,6 +356,13 @@ Graph& Graph::operator=(Graph&& other) noexcept
   _density = other._density;
 
   return *this;
+}
+
+const MutableVertexPartition* Graph::owner(const MutableVertexPartition* owner) noexcept
+{
+  if(!_owner || !_owner->get_graph())
+    _owner = owner;
+  return _owner;
 }
 
 int Graph::has_self_loops() const
@@ -572,7 +564,7 @@ void Graph::cache_neighbour_edges(Id v, igraph_neimode_t mode) const noexcept
     cerr << "Degree: " << degree << endl;
   #endif
 
-  vector<Id>* _cached_neigh_edges = NULL;
+  vector<Id>* _cached_neigh_edges = nullptr;
   switch (mode)
   {
     case IGRAPH_IN:
@@ -649,7 +641,7 @@ void Graph::cache_neighbours(Id v, igraph_neimode_t mode) const noexcept
     cerr << "Degree: " << degree << endl;
   #endif
 
-  vector<Id>* _cached_neighs = NULL;
+  vector<Id>* _cached_neighs = nullptr;
   switch (mode)
   {
     case IGRAPH_IN:

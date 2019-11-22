@@ -156,8 +156,6 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
     // Collapse graph (i.e. community graph)
     // If we do refine the partition, we separate communities in slightly more
     // fine-grained parts for which we collapse the graph.
-    vector<MutableVertexPartition*> sub_collapsed_partitions(nb_layers);
-
     vector<const Graph*> new_collapsed_graphs(nb_layers);
     vector<MutableVertexPartition*> new_collapsed_partitions(nb_layers);
 
@@ -166,6 +164,7 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
       // First create a new partition, which should be a sub partition
       // of the collapsed partition, i.e. such that all clusters of
       // the partition are strictly partitioned in the subpartition.
+      vector<MutableVertexPartition*> sub_collapsed_partitions(nb_layers);
 
       #ifdef DEBUG
         cerr << "\tBefore SLM " << collapsed_partitions[0]->n_communities() << " communities." << endl;
@@ -221,10 +220,12 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
         #endif // DEBUG
       }
 
+      aggregate_further = (new_collapsed_graphs[0]->vcount() < collapsed_graphs[0]->vcount()) &&
+                          (collapsed_graphs[0]->vcount() > collapsed_partitions[0]->n_communities());
       // Create new collapsed partition
       for (Id layer = 0; layer < nb_layers; layer++)
       {
-        delete sub_collapsed_partitions[layer];
+        delete sub_collapsed_partitions[layer];  // ATTENTION: may delete also collapsed_graphs
         new_collapsed_partitions[layer] = collapsed_partitions[layer]->create(new_collapsed_graphs[layer], new_collapsed_membership);
       }
     }
@@ -233,19 +234,17 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
       for (Id layer = 0; layer < nb_layers; layer++)
       {
         new_collapsed_graphs[layer] = collapsed_graphs[layer]->collapse_graph(collapsed_partitions[layer]);
-        // Create collapsed partition (i.e. default partition of each node in its own community).
-        new_collapsed_partitions[layer] = collapsed_partitions[layer]->create(new_collapsed_graphs[layer]);
         #ifdef DEBUG
           cerr << "Layer " << layer << endl;
           cerr << "Old collapsed graph " << collapsed_graphs[layer] << ", vcount is " << collapsed_graphs[layer]->vcount() << endl;
           cerr << "New collapsed graph " << new_collapsed_graphs[layer] << ", vcount is " << new_collapsed_graphs[layer]->vcount() << endl;
         #endif
+        // Create collapsed partition (i.e. default partition of each node in its own community).
+        new_collapsed_partitions[layer] = collapsed_partitions[layer]->create(new_collapsed_graphs[layer]);
       }
+      aggregate_further = (new_collapsed_graphs[0]->vcount() < collapsed_graphs[0]->vcount()) &&
+                          (collapsed_graphs[0]->vcount() > collapsed_partitions[0]->n_communities());
     }
-
-    aggregate_further = (new_collapsed_graphs[0]->vcount() < collapsed_graphs[0]->vcount()) &&
-                        (collapsed_graphs[0]->vcount() > collapsed_partitions[0]->n_communities());
-
     #ifdef DEBUG
       cerr << "Aggregate further " << aggregate_further << endl;
     #endif
@@ -254,9 +253,9 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
     for (Id layer = 0; layer < nb_layers; layer++)
     {
       if (collapsed_partitions[layer] != partitions[layer])
-        delete collapsed_partitions[layer];
-      if (collapsed_graphs[layer] != graphs[layer])
-        delete collapsed_graphs[layer];
+        delete collapsed_partitions[layer];  // ATTENTION: may delete also collapsed_graphs
+      //if (collapsed_graphs[layer] != graphs[layer])
+      //  delete collapsed_graphs[layer];
     }
 
     // and set them to the new one.
@@ -297,9 +296,8 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
   {
     if (collapsed_partitions[layer] != partitions[layer])
       delete collapsed_partitions[layer];
-
-    if (collapsed_graphs[layer] != graphs[layer])
-      delete collapsed_graphs[layer];
+    //if (collapsed_graphs[layer] != graphs[layer])
+    //  delete collapsed_graphs[layer];
   }
 
   // Make sure the resulting communities are called 0,...,r-1
@@ -448,8 +446,8 @@ Weight Optimiser::move_nodes(vector<MutableVertexPartition*> partitions, vector<
     Id v = vertex_order.front(); vertex_order.pop();
 
     set<Id> comms;
-    const Graph* graph = NULL;
-    MutableVertexPartition* partition = NULL;
+    const Graph* graph = nullptr;
+    MutableVertexPartition* partition = nullptr;
     // What is the current community of the node (this should be the same for all layers)
     Id v_comm = partitions[0]->membership(v);
 
@@ -685,7 +683,7 @@ Weight Optimiser::merge_nodes(vector<MutableVertexPartition*> partitions, vector
     if (partitions[0]->cnodes(v_comm) == 1)
     {
       set<Id> comms;
-      MutableVertexPartition* partition = NULL;
+      MutableVertexPartition* partition = nullptr;
 
       if (consider_comms == ALL_COMMS)
       {
@@ -879,8 +877,8 @@ Weight Optimiser::move_nodes_constrained(vector<MutableVertexPartition*> partiti
     Id v = vertex_order.front(); vertex_order.pop();
 
     set<Id> comms;
-    const Graph* graph = NULL;
-    MutableVertexPartition* partition = NULL;
+    const Graph* graph = nullptr;
+    MutableVertexPartition* partition = nullptr;
     // What is the current community of the node (this should be the same for all layers)
     Id v_comm = partitions[0]->membership(v);
 
@@ -1095,7 +1093,7 @@ Weight Optimiser::merge_nodes_constrained(vector<MutableVertexPartition*> partit
     if (partitions[0]->cnodes(v_comm) == 1)
     {
       set<Id> comms;
-      MutableVertexPartition* partition = NULL;
+      MutableVertexPartition* partition = nullptr;
 
       if (consider_comms == ALL_COMMS)
       {

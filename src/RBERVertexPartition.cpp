@@ -18,14 +18,14 @@ RBERVertexPartition::RBERVertexPartition(const Graph* graph)
   : LinearResolutionParameterVertexPartition(graph)
 {}
 
-RBERVertexPartition* RBERVertexPartition::create(const Graph* graph)
+RBERVertexPartition* RBERVertexPartition::create(const Graph* graph) const
 {
-  return new RBERVertexPartition(graph, this->resolution_parameter);
+  return new RBERVertexPartition(graph, resolution_parameter);
 }
 
-RBERVertexPartition* RBERVertexPartition::create(const Graph* graph, vector<Id> const& membership)
+RBERVertexPartition* RBERVertexPartition::create(const Graph* graph, vector<Id> const& membership) const
 {
-  return new RBERVertexPartition(graph, membership, this->resolution_parameter);
+  return new RBERVertexPartition(graph, membership, resolution_parameter);
 }
 
 RBERVertexPartition::~RBERVertexPartition()

@@ -28,40 +28,43 @@
                         recalculated each time."""
 *****************************************************************************/
 MutableVertexPartition::MutableVertexPartition(const Graph* graph, vector<Id> const& membership)
-: graph(graph), destructor_delete_graph(false), _membership(membership)
+: graph(graph), _membership(membership)
 {
+  const_cast<Graph*>(graph)->owner(this);  // Note: the owner is not updated if already exists
   if (membership.size() != graph->vcount())
     throw LeidenException("Membership vector has incorrect size.");
   init_admin();
 }
 
-MutableVertexPartition* MutableVertexPartition::create(const Graph* graph, vector<Id> const& membership)
-{
-  return new MutableVertexPartition(graph, membership);
-}
-
 MutableVertexPartition::MutableVertexPartition(const Graph* graph)
-: graph(graph), destructor_delete_graph(false),_membership(range(graph->vcount()))
+: graph(graph), _membership(range(graph->vcount()))
 {
+  const_cast<Graph*>(graph)->owner(this);  // Note: the owner is not updated if already exists
   init_admin();
 }
 
-MutableVertexPartition* MutableVertexPartition::create(const Graph* graph)
+MutableVertexPartition* MutableVertexPartition::create(const Graph* graph) const
 {
   return new MutableVertexPartition(graph);
 }
 
-MutableVertexPartition::MutableVertexPartition(MutableVertexPartition&& other) noexcept: graph(other.graph)
-  , destructor_delete_graph(other.destructor_delete_graph), _membership(other._membership)
+MutableVertexPartition* MutableVertexPartition::create(const Graph* graph
+  , vector<Id> const& membership) const
+{
+  return new MutableVertexPartition(graph, membership);
+}
+
+MutableVertexPartition::MutableVertexPartition(MutableVertexPartition&& other) noexcept
+  : graph(other.graph), _membership(other._membership)
 {
   other.graph = nullptr;
-  other.destructor_delete_graph = false;
+  const_cast<Graph*>(graph)->owner(this);  // ATTENTION: should be called only after nulling graph attribute of the previous owner
 }
 
 MutableVertexPartition::~MutableVertexPartition()
 {
   this->clean_mem();
-  if (destructor_delete_graph && graph) {
+  if(graph && graph->owner() == this) {
     delete graph;
     graph = nullptr;
   }
@@ -71,9 +74,7 @@ MutableVertexPartition& MutableVertexPartition::operator=(MutableVertexPartition
 {
   graph = other.graph;
   other.graph = nullptr;
-
-  destructor_delete_graph = other.destructor_delete_graph;
-  other.destructor_delete_graph = false;
+  const_cast<Graph*>(graph)->owner(this);  // ATTENTION: should be called only after nulling graph attribute of the previous owner
 
   _membership = move(other._membership);
 }
@@ -696,8 +697,8 @@ void MutableVertexPartition::cache_neigh_communities(Id v, igraph_neimode_t mode
   #ifdef DEBUG
     cerr << "Weight MutableVertexPartition::cache_neigh_communities(" << v << ", " << mode << ")." << endl;
   #endif
-  vector<Weight>* _cached_weight_tofrom_community = NULL;
-  vector<Id>* _cached_neighs = NULL;
+  vector<Weight>* _cached_weight_tofrom_community = nullptr;
+  vector<Id>* _cached_neighs = nullptr;
   switch (mode)
   {
     case IGRAPH_IN:
