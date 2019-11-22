@@ -7,7 +7,7 @@ leidenalg.egg-info/
 wlib/
 bin/
 obj/
-Makefile
+#Makefile
 *.log
 **/*.o
 **/*.so
@@ -15,9 +15,9 @@ Makefile
 files.txt
 files_py3.txt
 callgrind*
-main.cpp
+#main.cpp
 leiden-dists.zip
-leidenalg.cbp
+#leidenalg.cbp
 leidenalg.depend
 leidenalg.layout
 leiden.log

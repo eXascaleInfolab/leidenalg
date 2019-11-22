@@ -7,22 +7,16 @@
 class RBERVertexPartition : public LinearResolutionParameterVertexPartition
 {
   public:
-    RBERVertexPartition(Graph* graph,
-          vector<size_t> const& membership, double resolution_parameter);
-    RBERVertexPartition(Graph* graph,
-          vector<size_t> const& membership);
-    RBERVertexPartition(Graph* graph,
-      double resolution_parameter);
+    RBERVertexPartition(Graph* graph, vector<Id> const& membership, Weight resolution_parameter);
+    RBERVertexPartition(Graph* graph, vector<Id> const& membership);
+    RBERVertexPartition(Graph* graph, Weight resolution_parameter);
     RBERVertexPartition(Graph* graph);
     virtual ~RBERVertexPartition();
     virtual RBERVertexPartition* create(Graph* graph);
-    virtual RBERVertexPartition* create(Graph* graph, vector<size_t> const& membership);
+    virtual RBERVertexPartition* create(Graph* graph, vector<Id> const& membership);
 
-    virtual double diff_move(size_t v, size_t new_comm);
-    virtual double quality(double resolution_parameter);
-
-  protected:
-  private:
+    virtual Weight diff_move(Id v, Id new_comm);
+    virtual Weight quality(Weight resolution_parameter) const;
 };
 
 #endif // RBERVERTEXPARTITION_H

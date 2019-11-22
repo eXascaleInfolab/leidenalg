@@ -2,9 +2,9 @@ leidenalg
 ==============
 
 This package implements the Leiden algorithm in ``C++`` and exposes it to
-``python``.  It relies on ``(python-)igraph`` for it to function. Besides the
-relative flexibility of the implementation, it also scales well, and can be run
-on graphs of millions of nodes (as long as they can fit in memory). The core
+``python``.  It relies on `(python-)igraph https://igraph.org`_ for it to function.
+Besides the relative flexibility of the implementation, it also scales well, and can
+be run on graphs of millions of nodes (as long as they can fit in memory). The core
 function is ``find_partition`` which finds the optimal partition using the
 Leiden algorithm [1]_, which is an extension of the Louvain algorithm [2]_ for
 a number of different methods. The methods currently implemented are (1)
@@ -36,6 +36,7 @@ information.
 .. image:: https://anaconda.org/conda-forge/leidenalg/badges/version.svg
                 :target: https://anaconda.org/conda-forge/leidenalg
                 :alt: Anaconda (conda-forge)
+
 
 Installation
 ------------
@@ -166,6 +167,7 @@ Please cite the references appropriately in case they are used.
        (2010). Community structure in time-dependent, multiscale, and multiplex
        networks. Science, 328(5980), 876–8. `10.1126/science.1184819
        <http://doi.org/10.1126/science.1184819>`_
+
 
 Licence
 -------

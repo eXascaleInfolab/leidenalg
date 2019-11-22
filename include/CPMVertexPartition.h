@@ -3,25 +3,23 @@
 
 #include <LinearResolutionParameterVertexPartition.h>
 
+
 class CPMVertexPartition : public LinearResolutionParameterVertexPartition
 {
   public:
     CPMVertexPartition(Graph* graph,
-          vector<size_t> membership, double resolution_parameter);
+          vector<Id> membership, Weight resolution_parameter);
     CPMVertexPartition(Graph* graph,
-          vector<size_t> membership);
+          vector<Id> membership);
     CPMVertexPartition(Graph* graph,
-      double resolution_parameter);
+      Weight resolution_parameter);
     CPMVertexPartition(Graph* graph);
     virtual ~CPMVertexPartition();
     virtual CPMVertexPartition* create(Graph* graph);
-    virtual CPMVertexPartition* create(Graph* graph, vector<size_t> const& membership);
+    virtual CPMVertexPartition* create(Graph* graph, vector<Id> const& membership);
 
-    virtual double diff_move(size_t v, size_t new_comm);
-    virtual double quality(double resolution_parameter);
-
-  protected:
-  private:
+    virtual Weight diff_move(Id v, Id new_comm);
+    virtual Weight quality(Weight resolution_parameter) const;
 };
 
 #endif // CPMVERTEXPARTITION_H

@@ -3,23 +3,20 @@
 
 #include "MutableVertexPartition.h"
 #include <iostream>
-  using std::cerr;
-  using std::endl;
 
-class SurpriseVertexPartition: public MutableVertexPartition
+
+class SurpriseVertexPartition : public MutableVertexPartition
 {
   public:
-    SurpriseVertexPartition(Graph* graph, vector<size_t> const& membership);
+    SurpriseVertexPartition(Graph* graph, vector<Id> const& membership);
     SurpriseVertexPartition(Graph* graph, SurpriseVertexPartition* partition);
     SurpriseVertexPartition(Graph* graph);
     virtual ~SurpriseVertexPartition();
     virtual SurpriseVertexPartition* create(Graph* graph);
-    virtual SurpriseVertexPartition* create(Graph* graph, vector<size_t> const& membership);
+    virtual SurpriseVertexPartition* create(Graph* graph, vector<Id> const& membership);
 
-    virtual double diff_move(size_t v, size_t new_comm);
-    virtual double quality();
-  protected:
-  private:
+    virtual Weight diff_move(Id v, Id new_comm);
+    virtual Weight quality() const;
 };
 
 #endif // SURPRISEVERTEXPARTITION_H

@@ -3,31 +3,28 @@
 
 #include <MutableVertexPartition.h>
 
+
 class ResolutionParameterVertexPartition : public MutableVertexPartition
 {
   public:
-    ResolutionParameterVertexPartition(Graph* graph,
-          vector<size_t> membership, double resolution_parameter);
-    ResolutionParameterVertexPartition(Graph* graph,
-          vector<size_t> membership);
-    ResolutionParameterVertexPartition(Graph* graph, double resolution_parameter);
+    ResolutionParameterVertexPartition(Graph* graph
+      , vector<Id> membership, Weight resolution_parameter);
+    ResolutionParameterVertexPartition(Graph* graph, vector<Id> membership);
+    ResolutionParameterVertexPartition(Graph* graph, Weight resolution_parameter);
     ResolutionParameterVertexPartition(Graph* graph);
     virtual ~ResolutionParameterVertexPartition();
 
-    double resolution_parameter;
+    Weight resolution_parameter;
 
-    virtual double quality()
+    virtual Weight quality() const
     {
-      return this->quality(this->resolution_parameter);
+      return this->quality(resolution_parameter);
     };
 
-    virtual double quality(double resolution_parameter)
+    virtual Weight quality(Weight resolution_parameter) const
     {
-      throw Exception("Function not implemented. This should be implented in a derived class, since the base class does not implement a specific method.");
+      throw LeidenException("Function not implemented. This should be implented in a derived class, since the base class does not implement a specific method.");
     };
-
-  private:
-
 };
 
 #endif // RESOLUTIONPARAMETERVERTEXPARTITION_H

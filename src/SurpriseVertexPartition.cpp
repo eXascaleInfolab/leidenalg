@@ -1,49 +1,49 @@
 #include "SurpriseVertexPartition.h"
+using std::cerr;
+using std::endl;
 
-SurpriseVertexPartition::SurpriseVertexPartition(Graph* graph,
-      vector<size_t> const& membership) :
-        MutableVertexPartition(graph,
-        membership)
-{ }
 
-SurpriseVertexPartition::SurpriseVertexPartition(Graph* graph) :
-        MutableVertexPartition(graph)
-{ }
+SurpriseVertexPartition::SurpriseVertexPartition(Graph* graph, vector<Id> const& membership)
+  : MutableVertexPartition(graph, membership)
+{}
+
+SurpriseVertexPartition::SurpriseVertexPartition(Graph* graph): MutableVertexPartition(graph)
+{}
 
 SurpriseVertexPartition* SurpriseVertexPartition::create(Graph* graph)
 {
   return new SurpriseVertexPartition(graph);
 }
 
- SurpriseVertexPartition*  SurpriseVertexPartition::create(Graph* graph, vector<size_t> const& membership)
+ SurpriseVertexPartition*  SurpriseVertexPartition::create(Graph* graph, vector<Id> const& membership)
 {
   return new  SurpriseVertexPartition(graph, membership);
 }
 
 SurpriseVertexPartition::~SurpriseVertexPartition()
-{ }
+{}
 
-double SurpriseVertexPartition::diff_move(size_t v, size_t new_comm)
+Weight SurpriseVertexPartition::diff_move(Id v, Id new_comm)
 {
   #ifdef DEBUG
-    cerr << "virtual double SurpriseVertexPartition::diff_move(" << v << ", " << new_comm << ")" << endl;
+    cerr << "virtual Weight SurpriseVertexPartition::diff_move(" << v << ", " << new_comm << ")" << endl;
   #endif
-  size_t old_comm = this->membership(v);
-  size_t nsize = this->graph->node_size(v);
+  Id old_comm = this->membership(v);
+  Id nsize = this->graph->node_size(v);
   #ifdef DEBUG
     cerr << "\t" << "nsize: " << nsize << endl;
   #endif
-  double diff = 0.0;
-  double m = this->graph->total_weight();
+  Weight diff = 0.0;
+  Weight m = this->graph->total_weight();
 
   if (m == 0)
     return 0.0;
 
   if (new_comm != old_comm)
   {
-    double normalise = (2.0 - this->graph->is_directed());
-    size_t n = this->graph->total_size();
-    size_t n2 = this->graph->possible_edges(n);
+    Weight normalise = (2.0 - this->graph->is_directed());
+    Id n = this->graph->total_size();
+    Id n2 = this->graph->possible_edges(n);
 
     #ifdef DEBUG
       cerr << "\t" << "Community: " << old_comm << " => " << new_comm << "." << endl;
@@ -51,46 +51,46 @@ double SurpriseVertexPartition::diff_move(size_t v, size_t new_comm)
     #endif
 
     // Before move
-    double mc = this->total_weight_in_all_comms();
-    size_t nc2 = this->total_possible_edges_in_all_comms();
+    Weight mc = this->total_weight_in_all_comms();
+    Id nc2 = this->total_possible_edges_in_all_comms();
     #ifdef DEBUG
       cerr << "\t" << "mc: " << mc << ", nc2: " << nc2 << "." << endl;
     #endif
 
     // To old comm
-    size_t n_old = this->csize(old_comm);
-    double sw = this->graph->node_self_weight(v);
-    double wtc = this->weight_to_comm(v, old_comm) - sw;
-    double wfc = this->weight_from_comm(v, old_comm) - sw;
+    Id n_old = this->csize(old_comm);
+    Weight sw = this->graph->node_self_weight(v);
+    Weight wtc = this->weight_to_comm(v, old_comm) - sw;
+    Weight wfc = this->weight_from_comm(v, old_comm) - sw;
     #ifdef DEBUG
       cerr << "\t"  << "wtc: " << wtc << ", wfc: " << wfc << ", sw: " << sw << "." << endl;
     #endif
-    double m_old = wtc/normalise + wfc/normalise + sw;
+    Weight m_old = wtc/normalise + wfc/normalise + sw;
     #ifdef DEBUG
       cerr << "\t" << "m_old: " << m_old << ", n_old: " << n_old << "." << endl;
     #endif
 
     // To new comm
-    size_t n_new = this->csize(new_comm);
+    Id n_new = this->csize(new_comm);
     wtc = this->weight_to_comm(v, new_comm);
     wfc = this->weight_from_comm(v, new_comm);
     sw = this->graph->node_self_weight(v);
     #ifdef DEBUG
       cerr << "\t"  << "wtc: " << wtc << ", wfc: " << wfc << ", sw: " << sw << "." << endl;
     #endif
-    double m_new = wtc/normalise + wfc/normalise + sw;
+    Weight m_new = wtc/normalise + wfc/normalise + sw;
     #ifdef DEBUG
       cerr << "\t" << "m_new: " << m_new << ", n_new: " << n_new << "." << endl;
     #endif
 
-    double q = mc/m;
-    double s = (double)nc2/(double)n2;
-    double q_new = (mc - m_old + m_new)/m;
+    Weight q = mc/m;
+    Weight s = (Weight)nc2/(Weight)n2;
+    Weight q_new = (mc - m_old + m_new)/m;
     #ifdef DEBUG
       cerr << "\t" << "mc - m_old + m_new=" << (mc - m_old + m_new) << endl;
     #endif
-    double delta_nc2 = 2.0*nsize*(ptrdiff_t)(n_new - n_old + nsize)/normalise;
-    double s_new = (double)(nc2 + delta_nc2)/(double)n2;
+    Weight delta_nc2 = 2.0*nsize*(ptrdiff_t)(n_new - n_old + nsize)/normalise;
+    Weight s_new = (Weight)(nc2 + delta_nc2)/(Weight)n2;
     #ifdef DEBUG
       cerr << "\t" << "delta_nc2=" << delta_nc2 << endl;
     #endif
@@ -105,37 +105,37 @@ double SurpriseVertexPartition::diff_move(size_t v, size_t new_comm)
     #endif
   }
   #ifdef DEBUG
-    cerr << "exit double SurpriseVertexPartition::diff_move(" << v << ", " << new_comm << ")" << endl;
+    cerr << "exit Weight SurpriseVertexPartition::diff_move(" << v << ", " << new_comm << ")" << endl;
     cerr << "return " << diff << endl << endl;
   #endif
   return diff;
 }
 
-double SurpriseVertexPartition::quality()
+Weight SurpriseVertexPartition::quality() const
 {
   #ifdef DEBUG
-    cerr << "double SurpriseVertexPartition::quality()" << endl;
+    cerr << "Weight SurpriseVertexPartition::quality()" << endl;
   #endif
 
-  double mc = this->total_weight_in_all_comms();
-  size_t nc2 = this->total_possible_edges_in_all_comms();
-  double m = this->graph->total_weight();
-  size_t n = this->graph->total_size();
+  Weight mc = this->total_weight_in_all_comms();
+  Id nc2 = this->total_possible_edges_in_all_comms();
+  Weight m = this->graph->total_weight();
+  Id n = this->graph->total_size();
 
   if (m == 0)
     return 0.0;
 
-  size_t n2 = this->graph->possible_edges(n);
+  Id n2 = this->graph->possible_edges(n);
 
   #ifdef DEBUG
     cerr << "\t" << "mc=" << mc << ", m=" << m << ", nc2=" << nc2 << ", n2=" << n2 << "." << endl;
   #endif
-  double q = mc/m;
-  double s = (double)nc2/(double)n2;
+  Weight q = mc/m;
+  Weight s = (Weight)nc2/(Weight)n2;
   #ifdef DEBUG
     cerr << "\t" << "q:\t" << q << ", s:\t"  << s << "." << endl;
   #endif
-  double S = m*KLL(q,s);
+  Weight S = m*KLL(q,s);
   #ifdef DEBUG
     cerr << "exit SurpriseVertexPartition::quality()" << endl;
     cerr << "return " << S << endl << endl;

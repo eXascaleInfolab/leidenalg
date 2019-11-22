@@ -24,37 +24,37 @@ class Optimiser
 {
   public:
     Optimiser();
-    double optimise_partition(MutableVertexPartition* partition);
+    Weight optimise_partition(MutableVertexPartition* partition);
     template <class T> T* find_partition(Graph* graph);
-    template <class T> T* find_partition(Graph* graph, double resolution_parameter);
+    template <class T> T* find_partition(Graph* graph, Weight resolution_parameter);
 
     // The multiplex functions that simultaneously optimise multiple graphs and partitions (i.e. methods)
     // Each node will be in the same community in all graphs, and the graphs are expected to have identical nodes
     // Optionally we can loop over all possible communities instead of only the neighbours. In the case of negative
     // layer weights this may be necessary.
-    double optimise_partition(vector<MutableVertexPartition*> partitions, vector<double> layer_weights);
+    Weight optimise_partition(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights);
 
-    double move_nodes(MutableVertexPartition* partition);
-    double move_nodes(MutableVertexPartition* partition, int consider_comms);
-    double move_nodes(vector<MutableVertexPartition*> partitions, vector<double> layer_weights);
-    double move_nodes(vector<MutableVertexPartition*> partitions, vector<double> layer_weights, int consider_comms, int consider_empty_community);
+    Weight move_nodes(MutableVertexPartition* partition);
+    Weight move_nodes(MutableVertexPartition* partition, int consider_comms);
+    Weight move_nodes(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights);
+    Weight move_nodes(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, int consider_comms, int consider_empty_community);
 
-    double merge_nodes(MutableVertexPartition* partition);
-    double merge_nodes(MutableVertexPartition* partition, int consider_comms);
-    double merge_nodes(vector<MutableVertexPartition*> partitions, vector<double> layer_weights);
-    double merge_nodes(vector<MutableVertexPartition*> partitions, vector<double> layer_weights, int consider_comms);
+    Weight merge_nodes(MutableVertexPartition* partition);
+    Weight merge_nodes(MutableVertexPartition* partition, int consider_comms);
+    Weight merge_nodes(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights);
+    Weight merge_nodes(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, int consider_comms);
 
-    double move_nodes_constrained(MutableVertexPartition* partition, MutableVertexPartition* constrained_partition);
-    double move_nodes_constrained(MutableVertexPartition* partition, int consider_comms, MutableVertexPartition* constrained_partition);
-    double move_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<double> layer_weights, MutableVertexPartition* constrained_partition);
-    double move_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<double> layer_weights, int consider_comms, MutableVertexPartition* constrained_partition);
+    Weight move_nodes_constrained(MutableVertexPartition* partition, MutableVertexPartition* constrained_partition);
+    Weight move_nodes_constrained(MutableVertexPartition* partition, int consider_comms, MutableVertexPartition* constrained_partition);
+    Weight move_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, MutableVertexPartition* constrained_partition);
+    Weight move_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, int consider_comms, MutableVertexPartition* constrained_partition);
 
-    double merge_nodes_constrained(MutableVertexPartition* partition, MutableVertexPartition* constrained_partition);
-    double merge_nodes_constrained(MutableVertexPartition* partition, int consider_comms, MutableVertexPartition* constrained_partition);
-    double merge_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<double> layer_weights, MutableVertexPartition* constrained_partition);
-    double merge_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<double> layer_weights, int consider_comms, MutableVertexPartition* constrained_partition);
+    Weight merge_nodes_constrained(MutableVertexPartition* partition, MutableVertexPartition* constrained_partition);
+    Weight merge_nodes_constrained(MutableVertexPartition* partition, int consider_comms, MutableVertexPartition* constrained_partition);
+    Weight merge_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, MutableVertexPartition* constrained_partition);
+    Weight merge_nodes_constrained(vector<MutableVertexPartition*> partitions, vector<Weight> layer_weights, int consider_comms, MutableVertexPartition* constrained_partition);
 
-    inline void set_rng_seed(size_t seed) { igraph_rng_seed(&rng, seed); };
+    inline void set_rng_seed(Id seed) { igraph_rng_seed(&rng, seed); };
 
     virtual ~Optimiser();
 
@@ -91,7 +91,7 @@ template <class T> T* Optimiser::find_partition(Graph* graph)
   return partition;
 }
 
-template <class T> T* Optimiser::find_partition(Graph* graph, double resolution_parameter)
+template <class T> T* Optimiser::find_partition(Graph* graph, Weight resolution_parameter)
 {
   T* partition = new T(graph, resolution_parameter);
   #ifdef DEBUG

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="leiden" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/leiden" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Winline" />
+					<Add option="-Wswitch-enum" />
+					<Add option="-Wswitch-default" />
+					<Add option="-Wmain" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/leiden" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-march=core2" />
+					<Add option="-fomit-frame-pointer" />
+					<Add option="-O3" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Environment>
+				<Variable name="IGRAPH_DIR" value="/opt/repos/igraph" />
+			</Environment>
+		</Build>
+		<Compiler>
+			<Add option="-Wnon-virtual-dtor" />
+			<Add option="-Wcast-align" />
+			<Add option="-Wundef" />
+			<Add option="-Wfloat-equal" />
+			<Add option="-Wunreachable-code" />
+			<Add option="-Wmissing-include-dirs" />
+			<Add option="-Weffc++" />
+			<Add option="-Wzero-as-null-pointer-constant" />
+			<Add option="-std=c++14" />
+			<Add option="-fexceptions" />
+			<Add option="-fstack-protector-strong" />
+			<Add directory="include" />
+			<Add directory="$$(IGRAPH_DIR)/include" />
+			<Add directory="autogen" />
+		</Compiler>
+		<Linker>
+			<Add library="libigraph" />
+		</Linker>
+		<Unit filename="autogen/cmdline.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="autogen/cmdline.h" />
+		<Unit filename="include/CPMVertexPartition.h" />
+		<Unit filename="include/GraphHelper.h" />
+		<Unit filename="include/LinearResolutionParameterVertexPartition.h" />
+		<Unit filename="include/ModularityVertexPartition.h" />
+		<Unit filename="include/MutableVertexPartition.h" />
+		<Unit filename="include/Optimiser.h" />
+		<Unit filename="include/RBConfigurationVertexPartition.h" />
+		<Unit filename="include/RBERVertexPartition.h" />
+		<Unit filename="include/ResolutionParameterVertexPartition.h" />
+		<Unit filename="include/SignificanceVertexPartition.h" />
+		<Unit filename="include/SurpriseVertexPartition.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/CPMVertexPartition.cpp" />
+		<Unit filename="src/GraphHelper.cpp" />
+		<Unit filename="src/LinearResolutionParameterVertexPartition.cpp" />
+		<Unit filename="src/ModularityVertexPartition.cpp" />
+		<Unit filename="src/MutableVertexPartition.cpp" />
+		<Unit filename="src/Optimiser.cpp" />
+		<Unit filename="src/RBConfigurationVertexPartition.cpp" />
+		<Unit filename="src/RBERVertexPartition.cpp" />
+		<Unit filename="src/ResolutionParameterVertexPartition.cpp" />
+		<Unit filename="src/SignificanceVertexPartition.cpp" />
+		<Unit filename="src/SurpriseVertexPartition.cpp" />
+		<Extensions>
+			<DoxyBlocks>
+				<comment_style block="1" line="1" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
