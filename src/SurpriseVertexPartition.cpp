@@ -3,19 +3,19 @@ using std::cerr;
 using std::endl;
 
 
-SurpriseVertexPartition::SurpriseVertexPartition(Graph* graph, vector<Id> const& membership)
+SurpriseVertexPartition::SurpriseVertexPartition(const Graph* graph, vector<Id> const& membership)
   : MutableVertexPartition(graph, membership)
 {}
 
-SurpriseVertexPartition::SurpriseVertexPartition(Graph* graph): MutableVertexPartition(graph)
+SurpriseVertexPartition::SurpriseVertexPartition(const Graph* graph): MutableVertexPartition(graph)
 {}
 
-SurpriseVertexPartition* SurpriseVertexPartition::create(Graph* graph)
+SurpriseVertexPartition* SurpriseVertexPartition::create(const Graph* graph)
 {
   return new SurpriseVertexPartition(graph);
 }
 
- SurpriseVertexPartition*  SurpriseVertexPartition::create(Graph* graph, vector<Id> const& membership)
+ SurpriseVertexPartition*  SurpriseVertexPartition::create(const Graph* graph, vector<Id> const& membership)
 {
   return new  SurpriseVertexPartition(graph, membership);
 }
@@ -36,8 +36,8 @@ Weight SurpriseVertexPartition::diff_move(Id v, Id new_comm)
   Weight diff = 0.0;
   Weight m = this->graph->total_weight();
 
-  if (m == 0)
-    return 0.0;
+  if(!m)  // Note: strict comparison is fine here
+    return 0;
 
   if (new_comm != old_comm)
   {
@@ -122,8 +122,8 @@ Weight SurpriseVertexPartition::quality() const
   Weight m = this->graph->total_weight();
   Id n = this->graph->total_size();
 
-  if (m == 0)
-    return 0.0;
+  if(!m)  // Note: strict comparison is fine here
+    return 0;
 
   Id n2 = this->graph->possible_edges(n);
 

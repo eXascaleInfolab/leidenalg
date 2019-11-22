@@ -17,6 +17,9 @@ some support for community detection on bipartite graphs. See the
 `documentation <http://leidenalg.readthedocs.io/en/latest/>`_ for more
 information.
 
+The original package is extended with the C++ compilable interface, NSL format
+input and optimized (mostly igraph interoperability) by Artem Lutov <artem@exascale.info>.
+
 .. image:: https://readthedocs.org/projects/leidenalg/badge
                 :target: http://leidenalg.readthedocs.io/en/latest/
                 :alt: Leiden documentation status

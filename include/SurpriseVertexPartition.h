@@ -8,12 +8,12 @@
 class SurpriseVertexPartition : public MutableVertexPartition
 {
   public:
-    SurpriseVertexPartition(Graph* graph, vector<Id> const& membership);
-    SurpriseVertexPartition(Graph* graph, SurpriseVertexPartition* partition);
-    SurpriseVertexPartition(Graph* graph);
+    SurpriseVertexPartition(const Graph* graph, vector<Id> const& membership);
+    SurpriseVertexPartition(const Graph* graph, SurpriseVertexPartition* partition);
+    SurpriseVertexPartition(const Graph* graph);
     virtual ~SurpriseVertexPartition();
-    virtual SurpriseVertexPartition* create(Graph* graph);
-    virtual SurpriseVertexPartition* create(Graph* graph, vector<Id> const& membership);
+    virtual SurpriseVertexPartition* create(const Graph* graph);
+    virtual SurpriseVertexPartition* create(const Graph* graph, vector<Id> const& membership);
 
     virtual Weight diff_move(Id v, Id new_comm);
     virtual Weight quality() const;

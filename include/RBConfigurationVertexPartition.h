@@ -7,14 +7,14 @@
 class RBConfigurationVertexPartition : public LinearResolutionParameterVertexPartition
 {
   public:
-    RBConfigurationVertexPartition(Graph* graph, vector<Id> const& membership
+    RBConfigurationVertexPartition(const Graph* graph, vector<Id> const& membership
       , Weight resolution_parameter);
-    RBConfigurationVertexPartition(Graph* graph, vector<Id> const& membership);
-    RBConfigurationVertexPartition(Graph* graph, Weight resolution_parameter);
-    RBConfigurationVertexPartition(Graph* graph);
+    RBConfigurationVertexPartition(const Graph* graph, vector<Id> const& membership);
+    RBConfigurationVertexPartition(const Graph* graph, Weight resolution_parameter);
+    RBConfigurationVertexPartition(const Graph* graph);
     virtual ~RBConfigurationVertexPartition();
-    virtual RBConfigurationVertexPartition* create(Graph* graph);
-    virtual RBConfigurationVertexPartition* create(Graph* graph, vector<Id> const& membership);
+    virtual RBConfigurationVertexPartition* create(const Graph* graph);
+    virtual RBConfigurationVertexPartition* create(const Graph* graph, vector<Id> const& membership);
 
     virtual Weight diff_move(Id v, Id new_comm);
     virtual Weight quality(Weight resolution_parameter) const;

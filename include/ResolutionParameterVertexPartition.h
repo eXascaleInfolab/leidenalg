@@ -7,11 +7,11 @@
 class ResolutionParameterVertexPartition : public MutableVertexPartition
 {
   public:
-    ResolutionParameterVertexPartition(Graph* graph
+    ResolutionParameterVertexPartition(const Graph* graph
       , vector<Id> membership, Weight resolution_parameter);
-    ResolutionParameterVertexPartition(Graph* graph, vector<Id> membership);
-    ResolutionParameterVertexPartition(Graph* graph, Weight resolution_parameter);
-    ResolutionParameterVertexPartition(Graph* graph);
+    ResolutionParameterVertexPartition(const Graph* graph, vector<Id> membership);
+    ResolutionParameterVertexPartition(const Graph* graph, Weight resolution_parameter);
+    ResolutionParameterVertexPartition(const Graph* graph);
     virtual ~ResolutionParameterVertexPartition();
 
     Weight resolution_parameter;
@@ -23,7 +23,7 @@ class ResolutionParameterVertexPartition : public MutableVertexPartition
 
     virtual Weight quality(Weight resolution_parameter) const
     {
-      throw LeidenException("Function not implemented. This should be implented in a derived class, since the base class does not implement a specific method.");
+      throw LeidenException("Function not implemented. This should be implemented in a derived class, since the base class does not implement a specific method.");
     };
 };
 

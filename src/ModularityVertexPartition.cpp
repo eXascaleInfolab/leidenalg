@@ -6,22 +6,22 @@ using std::cerr;
 using std::endl;
 #endif
 
-ModularityVertexPartition::ModularityVertexPartition(Graph* graph, vector<Id> const& membership)
+ModularityVertexPartition::ModularityVertexPartition(const Graph* graph, vector<Id> const& membership)
   : MutableVertexPartition(graph, membership)
 {}
 
-ModularityVertexPartition::ModularityVertexPartition(Graph* graph): MutableVertexPartition(graph)
+ModularityVertexPartition::ModularityVertexPartition(const Graph* graph): MutableVertexPartition(graph)
 {}
 
 ModularityVertexPartition::~ModularityVertexPartition()
 {}
 
-ModularityVertexPartition* ModularityVertexPartition::create(Graph* graph)
+ModularityVertexPartition* ModularityVertexPartition::create(const Graph* graph)
 {
   return new ModularityVertexPartition(graph);
 }
 
-ModularityVertexPartition* ModularityVertexPartition::create(Graph* graph, vector<Id> const& membership)
+ModularityVertexPartition* ModularityVertexPartition::create(const Graph* graph, vector<Id> const& membership)
 {
   return new ModularityVertexPartition(graph, membership);
 }

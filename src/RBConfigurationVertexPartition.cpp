@@ -1,33 +1,33 @@
 #include "RBConfigurationVertexPartition.h"
 
-RBConfigurationVertexPartition::RBConfigurationVertexPartition(Graph* graph
+RBConfigurationVertexPartition::RBConfigurationVertexPartition(const Graph* graph
   , vector<Id> const& membership, Weight resolution_parameter)
   : LinearResolutionParameterVertexPartition(graph, membership, resolution_parameter)
 {}
 
-RBConfigurationVertexPartition::RBConfigurationVertexPartition(Graph* graph
+RBConfigurationVertexPartition::RBConfigurationVertexPartition(const Graph* graph
   , vector<Id> const& membership)
   : LinearResolutionParameterVertexPartition(graph, membership)
 {}
 
-RBConfigurationVertexPartition::RBConfigurationVertexPartition(Graph* graph
+RBConfigurationVertexPartition::RBConfigurationVertexPartition(const Graph* graph
   , Weight resolution_parameter)
   : LinearResolutionParameterVertexPartition(graph, resolution_parameter)
 {}
 
-RBConfigurationVertexPartition::RBConfigurationVertexPartition(Graph* graph)
+RBConfigurationVertexPartition::RBConfigurationVertexPartition(const Graph* graph)
   : LinearResolutionParameterVertexPartition(graph)
 {}
 
 RBConfigurationVertexPartition::~RBConfigurationVertexPartition()
 {}
 
-RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(Graph* graph)
+RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(const Graph* graph)
 {
   return new RBConfigurationVertexPartition(graph, this->resolution_parameter);
 }
 
-RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(Graph* graph, vector<Id> const& membership)
+RBConfigurationVertexPartition* RBConfigurationVertexPartition::create(const Graph* graph, vector<Id> const& membership)
 {
   return new RBConfigurationVertexPartition(graph, membership, this->resolution_parameter);
 }
@@ -43,8 +43,10 @@ Weight RBConfigurationVertexPartition::diff_move(Id v, Id new_comm)
   Id old_comm = this->_membership[v];
   Weight diff = 0.0;
   Weight total_weight = this->graph->total_weight()*(2.0 - this->graph->is_directed());
-  if (total_weight == 0.0)
-    return 0.0;
+
+  if(!total_weight)  // Note: strict comparison is fine here
+    return 0;
+
   if (new_comm != old_comm)
   {
     #ifdef DEBUG
@@ -136,8 +138,8 @@ Weight RBConfigurationVertexPartition::quality(Weight resolution_parameter) cons
   else
     m = 2*this->graph->total_weight();
 
-  if (m == 0)
-    return 0.0;
+  if(!m)  // Note: strict comparison is fine here
+    return 0;
 
   for (Id c = 0; c < this->n_communities(); c++)
   {

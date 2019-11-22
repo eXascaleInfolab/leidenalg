@@ -1,21 +1,22 @@
 #include "ResolutionParameterVertexPartition.h"
 
-ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(Graph* graph,
+ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(const Graph* graph,
   vector<Id> membership, Weight resolution_parameter)
-  : MutableVertexPartition(graph, membership)
-{ this->resolution_parameter = resolution_parameter; }
+  : MutableVertexPartition(graph, membership), resolution_parameter(resolution_parameter)
+{}
 
-ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(Graph* graph,
-  vector<Id> membership): MutableVertexPartition(graph, membership)
-{ this->resolution_parameter = 1.0; }
+ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(const Graph* graph,
+  vector<Id> membership): MutableVertexPartition(graph, membership), resolution_parameter(1.0)
+{}
 
-ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(Graph* graph,
-	Weight resolution_parameter): MutableVertexPartition(graph)
-{ this->resolution_parameter = resolution_parameter;  }
+ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(const Graph* graph,
+  Weight resolution_parameter)
+  : MutableVertexPartition(graph), resolution_parameter(resolution_parameter)
+{}
 
-ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(Graph* graph)
-	: MutableVertexPartition(graph)
-{ this->resolution_parameter = 1.0;  }
+ResolutionParameterVertexPartition::ResolutionParameterVertexPartition(const Graph* graph)
+	: MutableVertexPartition(graph), resolution_parameter(1.0)
+{}
 
 ResolutionParameterVertexPartition::~ResolutionParameterVertexPartition()
 {}

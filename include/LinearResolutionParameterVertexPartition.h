@@ -7,11 +7,11 @@
 class LinearResolutionParameterVertexPartition : public ResolutionParameterVertexPartition
 {
   public:
-    LinearResolutionParameterVertexPartition(Graph* graph, vector<Id> membership
+    LinearResolutionParameterVertexPartition(const Graph* graph, vector<Id> membership
 		, Weight resolution_parameter);
-    LinearResolutionParameterVertexPartition(Graph* graph, vector<Id> membership);
-    LinearResolutionParameterVertexPartition(Graph* graph, Weight resolution_parameter);
-    LinearResolutionParameterVertexPartition(Graph* graph);
+    LinearResolutionParameterVertexPartition(const Graph* graph, vector<Id> membership);
+    LinearResolutionParameterVertexPartition(const Graph* graph, Weight resolution_parameter);
+    LinearResolutionParameterVertexPartition(const Graph* graph);
     virtual ~LinearResolutionParameterVertexPartition();
 };
 

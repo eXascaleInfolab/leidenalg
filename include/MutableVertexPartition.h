@@ -46,9 +46,7 @@ class MutableVertexPartition
 {
   public:
     MutableVertexPartition(const Graph* graph, vector<Id> const& membership);
-    virtual MutableVertexPartition* create(const Graph* graph, vector<Id> const& membership);
     MutableVertexPartition(const Graph* graph);
-    virtual MutableVertexPartition* create(const Graph* graph);
 //    //! \brief Acquire the graph and delete it on destruction
 //    //!
 //    //! \param graph Graph*&  - graph to be acquired
@@ -63,6 +61,9 @@ class MutableVertexPartition
     virtual MutableVertexPartition& operator=(const MutableVertexPartition&)=delete;
     virtual MutableVertexPartition& operator=(MutableVertexPartition&& other) noexcept;
 
+    virtual MutableVertexPartition* create(const Graph* graph, vector<Id> const& membership);
+    virtual MutableVertexPartition* create(const Graph* graph);
+
     inline Id membership(Id v) const noexcept { return this->_membership[v]; };
     inline vector<Id> const& membership() const noexcept { return this->_membership; };
 
@@ -75,15 +76,14 @@ class MutableVertexPartition
     void move_node(Id v,Id new_comm);
     virtual Weight diff_move(Id v, Id new_comm)
     {
-      throw LeidenException("Function not implemented. This should be implented in a derived class, since the base class does not implement a specific method.");
+      throw LeidenException("Function not implemented. This should be implemented in a derived class, since the base class does not implement a specific method.");
     };
     virtual Weight quality() const
     {
-      throw LeidenException("Function not implemented. This should be implented in a derived class, since the base class does not implement a specific method.");
+      throw LeidenException("Function not implemented. This should be implemented in a derived class, since the base class does not implement a specific method.");
     };
 
     inline const Graph* get_graph() const noexcept  { return this->graph; };
-    inline Graph* get_graph() noexcept  { return const_cast<Graph*>(this->graph); };
 
     void renumber_communities();
     void renumber_communities(vector<Id> const& new_membership);

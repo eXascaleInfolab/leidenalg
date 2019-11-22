@@ -7,11 +7,11 @@
 class SignificanceVertexPartition : public MutableVertexPartition
 {
   public:
-    SignificanceVertexPartition(Graph* graph, vector<Id> const& membership);
-    SignificanceVertexPartition(Graph* graph);
+    SignificanceVertexPartition(const Graph* graph, vector<Id> const& membership);
+    SignificanceVertexPartition(const Graph* graph);
     virtual ~SignificanceVertexPartition();
-    virtual SignificanceVertexPartition* create(Graph* graph);
-    virtual SignificanceVertexPartition* create(Graph* graph, vector<Id> const& membership);
+    virtual SignificanceVertexPartition* create(const Graph* graph);
+    virtual SignificanceVertexPartition* create(const Graph* graph, vector<Id> const& membership);
 
     virtual Weight diff_move(Id v, Id new_comm);
     virtual Weight quality() const;

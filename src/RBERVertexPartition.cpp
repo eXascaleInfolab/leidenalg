@@ -1,29 +1,29 @@
 #include "RBERVertexPartition.h"
 
-RBERVertexPartition::RBERVertexPartition(Graph* graph
+RBERVertexPartition::RBERVertexPartition(const Graph* graph
   , vector<Id> const& membership, Weight resolution_parameter)
   : LinearResolutionParameterVertexPartition(graph, membership, resolution_parameter)
 {}
 
-RBERVertexPartition::RBERVertexPartition(Graph* graph
+RBERVertexPartition::RBERVertexPartition(const Graph* graph
   , vector<Id> const& membership)
   : LinearResolutionParameterVertexPartition(graph, membership)
 {}
 
-RBERVertexPartition::RBERVertexPartition(Graph* graph, Weight resolution_parameter)
+RBERVertexPartition::RBERVertexPartition(const Graph* graph, Weight resolution_parameter)
   : LinearResolutionParameterVertexPartition(graph, resolution_parameter)
 {}
 
-RBERVertexPartition::RBERVertexPartition(Graph* graph)
+RBERVertexPartition::RBERVertexPartition(const Graph* graph)
   : LinearResolutionParameterVertexPartition(graph)
 {}
 
-RBERVertexPartition* RBERVertexPartition::create(Graph* graph)
+RBERVertexPartition* RBERVertexPartition::create(const Graph* graph)
 {
   return new RBERVertexPartition(graph, this->resolution_parameter);
 }
 
-RBERVertexPartition* RBERVertexPartition::create(Graph* graph, vector<Id> const& membership)
+RBERVertexPartition* RBERVertexPartition::create(const Graph* graph, vector<Id> const& membership)
 {
   return new RBERVertexPartition(graph, membership, this->resolution_parameter);
 }

@@ -20,15 +20,11 @@
         RAND_NEIGH_COMM -- Consider a random community among the neighbours
                            for improvement.
 ****************************************************************************/
-Optimiser::Optimiser()
+Optimiser::Optimiser(): consider_comms(Optimiser::ALL_NEIGH_COMMS),
+  refine_partition(true), refine_consider_comms(Optimiser::ALL_NEIGH_COMMS),
+  optimise_routine(Optimiser::MOVE_NODES), refine_routine(Optimiser::MERGE_NODES),
+  consider_empty_community(true)
 {
-  this->consider_comms = Optimiser::ALL_NEIGH_COMMS;
-  this->optimise_routine = Optimiser::MOVE_NODES;
-  this->refine_consider_comms = Optimiser::ALL_NEIGH_COMMS;
-  this->refine_routine = Optimiser::MERGE_NODES;
-  this->refine_partition = true;
-  this->consider_empty_community = true;
-
   igraph_rng_init(&rng, &igraph_rngtype_mt19937);
   igraph_rng_seed(&rng, rand());
 }
@@ -77,7 +73,7 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
     throw LeidenException("No partitions provided.");
 
   // Get graphs for all layers
-  vector<Graph*> graphs(nb_layers);
+  vector<const Graph*> graphs(nb_layers);
   for (Id layer = 0; layer < nb_layers; layer++)
     graphs[layer] = partitions[layer]->get_graph();
 
@@ -93,7 +89,7 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
       throw LeidenException("Number of nodes are not equal for all graphs.");
 
   // Initialize the vector of the collapsed graphs for all layers
-  vector<Graph*> collapsed_graphs(nb_layers);
+  vector<const Graph*> collapsed_graphs(nb_layers);
   vector<MutableVertexPartition*> collapsed_partitions(nb_layers);
 
   // Declare the collapsed_graph variable which will contain the graph
@@ -162,7 +158,7 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
     // fine-grained parts for which we collapse the graph.
     vector<MutableVertexPartition*> sub_collapsed_partitions(nb_layers);
 
-    vector<Graph*> new_collapsed_graphs(nb_layers);
+    vector<const Graph*> new_collapsed_graphs(nb_layers);
     vector<MutableVertexPartition*> new_collapsed_partitions(nb_layers);
 
     if (this->refine_partition)
@@ -264,8 +260,8 @@ Weight Optimiser::optimise_partition(vector<MutableVertexPartition*> partitions,
     }
 
     // and set them to the new one.
-    collapsed_partitions = new_collapsed_partitions;
-    collapsed_graphs = new_collapsed_graphs;
+    collapsed_partitions = move(new_collapsed_partitions);
+    collapsed_graphs = move(new_collapsed_graphs);
 
     #ifdef DEBUG
       for (Id layer = 0; layer < nb_layers; layer++)
@@ -408,7 +404,7 @@ Weight Optimiser::move_nodes(vector<MutableVertexPartition*> partitions, vector<
   if (nb_layers == 0)
     return -1.0;
   // Get graphs
-  vector<Graph*> graphs(nb_layers);
+  vector<const Graph*> graphs(nb_layers);
   for (Id layer = 0; layer < nb_layers; layer++)
     graphs[layer] = partitions[layer]->get_graph();
   // Number of nodes in the graph
@@ -452,7 +448,7 @@ Weight Optimiser::move_nodes(vector<MutableVertexPartition*> partitions, vector<
     Id v = vertex_order.front(); vertex_order.pop();
 
     set<Id> comms;
-    Graph* graph = NULL;
+    const Graph* graph = NULL;
     MutableVertexPartition* partition = NULL;
     // What is the current community of the node (this should be the same for all layers)
     Id v_comm = partitions[0]->membership(v);
@@ -630,7 +626,7 @@ Weight Optimiser::move_nodes(vector<MutableVertexPartition*> partitions, vector<
     partitions[layer]->renumber_communities(membership);
     #ifdef DEBUG
       cerr << "Renumbered communities for layer " << layer << " for " << partitions[layer]->n_communities() << " communities." << endl;
-    #endif DEBUG
+    #endif  // DEBUG
   }
   return total_improv;
 }
@@ -652,7 +648,7 @@ Weight Optimiser::merge_nodes(vector<MutableVertexPartition*> partitions, vector
     return -1.0;
 
   // Get graphs
-  vector<Graph*> graphs(nb_layers);
+  vector<const Graph*> graphs(nb_layers);
   for (Id layer = 0; layer < nb_layers; layer++)
     graphs[layer] = partitions[layer]->get_graph();
   // Number of nodes in the graph
@@ -817,7 +813,7 @@ Weight Optimiser::merge_nodes(vector<MutableVertexPartition*> partitions, vector
     partitions[layer]->renumber_communities(membership);
     #ifdef DEBUG
       cerr << "Renumbered communities for layer " << layer << " for " << partitions[layer]->n_communities() << " communities." << endl;
-    #endif DEBUG
+    #endif  // DEBUG
   }
   return total_improv;
 }
@@ -837,7 +833,7 @@ Weight Optimiser::move_nodes_constrained(vector<MutableVertexPartition*> partiti
   if (nb_layers == 0)
     return -1.0;
   // Get graphs
-  vector<Graph*> graphs(nb_layers);
+  vector<const Graph*> graphs(nb_layers);
   for (Id layer = 0; layer < nb_layers; layer++)
     graphs[layer] = partitions[layer]->get_graph();
   // Number of nodes in the graph
@@ -883,7 +879,7 @@ Weight Optimiser::move_nodes_constrained(vector<MutableVertexPartition*> partiti
     Id v = vertex_order.front(); vertex_order.pop();
 
     set<Id> comms;
-    Graph* graph = NULL;
+    const Graph* graph = NULL;
     MutableVertexPartition* partition = NULL;
     // What is the current community of the node (this should be the same for all layers)
     Id v_comm = partitions[0]->membership(v);
@@ -1041,7 +1037,7 @@ Weight Optimiser::move_nodes_constrained(vector<MutableVertexPartition*> partiti
     partitions[layer]->renumber_communities(membership);
     #ifdef DEBUG
       cerr << "Renumbered communities for layer " << layer << " for " << partitions[layer]->n_communities() << " communities." << endl;
-    #endif DEBUG
+    #endif  // DEBUG
   }
   return total_improv;
 }
@@ -1063,7 +1059,7 @@ Weight Optimiser::merge_nodes_constrained(vector<MutableVertexPartition*> partit
     return -1.0;
 
   // Get graphs
-  vector<Graph*> graphs(nb_layers);
+  vector<const Graph*> graphs(nb_layers);
   for (Id layer = 0; layer < nb_layers; layer++)
     graphs[layer] = partitions[layer]->get_graph();
   // Number of nodes in the graph
@@ -1235,7 +1231,7 @@ Weight Optimiser::merge_nodes_constrained(vector<MutableVertexPartition*> partit
     partitions[layer]->renumber_communities(membership);
     #ifdef DEBUG
       cerr << "Renumbered communities for layer " << layer << " for " << partitions[layer]->n_communities() << " communities." << endl;
-    #endif DEBUG
+    #endif  // DEBUG
   }
   return total_improv;
 }

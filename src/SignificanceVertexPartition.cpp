@@ -6,20 +6,20 @@ using std::cerr;
 using std::endl;
 #endif
 
-SignificanceVertexPartition::SignificanceVertexPartition(Graph* graph
+SignificanceVertexPartition::SignificanceVertexPartition(const Graph* graph
   , vector<Id> const& membership): MutableVertexPartition(graph, membership)
 {}
 
-SignificanceVertexPartition::SignificanceVertexPartition(Graph* graph)
+SignificanceVertexPartition::SignificanceVertexPartition(const Graph* graph)
   : MutableVertexPartition(graph)
 {}
 
-SignificanceVertexPartition* SignificanceVertexPartition::create(Graph* graph)
+SignificanceVertexPartition* SignificanceVertexPartition::create(const Graph* graph)
 {
   return new SignificanceVertexPartition(graph);
 }
 
-SignificanceVertexPartition* SignificanceVertexPartition::create(Graph* graph, vector<Id> const& membership)
+SignificanceVertexPartition* SignificanceVertexPartition::create(const Graph* graph, vector<Id> const& membership)
 {
   return new SignificanceVertexPartition(graph, membership);
 }

@@ -25,8 +25,8 @@ class Optimiser
   public:
     Optimiser();
     Weight optimise_partition(MutableVertexPartition* partition);
-    template <class T> T* find_partition(Graph* graph);
-    template <class T> T* find_partition(Graph* graph, Weight resolution_parameter);
+    template <class T> T* find_partition(const Graph* graph);
+    template <class T> T* find_partition(const Graph* graph, Weight resolution_parameter);
 
     // The multiplex functions that simultaneously optimise multiple graphs and partitions (i.e. methods)
     // Each node will be in the same community in all graphs, and the graphs are expected to have identical nodes
@@ -81,7 +81,7 @@ class Optimiser
     igraph_rng_t rng;
 };
 
-template <class T> T* Optimiser::find_partition(Graph* graph)
+template <class T> T* Optimiser::find_partition(const Graph* graph)
 {
   T* partition = new T(graph);
   #ifdef DEBUG
@@ -91,7 +91,7 @@ template <class T> T* Optimiser::find_partition(Graph* graph)
   return partition;
 }
 
-template <class T> T* Optimiser::find_partition(Graph* graph, Weight resolution_parameter)
+template <class T> T* Optimiser::find_partition(const Graph* graph, Weight resolution_parameter)
 {
   T* partition = new T(graph, resolution_parameter);
   #ifdef DEBUG

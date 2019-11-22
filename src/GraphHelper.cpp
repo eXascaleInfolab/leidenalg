@@ -801,7 +801,7 @@ Id Graph::get_random_neighbour(Id v, igraph_neimode_t mode, igraph_rng_t* rng) c
   of a node in the new graph is simply the size of the community in the old
   graph.
 *****************************************************************************/
-Graph* Graph::collapse_graph(MutableVertexPartition* partition)
+Graph* Graph::collapse_graph(MutableVertexPartition* partition) const
 {
   #ifdef DEBUG
     cerr << "Graph* Graph::collapse_graph(vector<Id> membership)" << endl;

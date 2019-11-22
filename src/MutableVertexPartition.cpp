@@ -27,7 +27,6 @@
                         weight? If None, the self_weight is
                         recalculated each time."""
 *****************************************************************************/
-
 MutableVertexPartition::MutableVertexPartition(const Graph* graph, vector<Id> const& membership)
 : graph(graph), destructor_delete_graph(false), _membership(membership)
 {

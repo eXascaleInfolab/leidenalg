@@ -57,7 +57,7 @@ struct LeidenException: std::runtime_error
     virtual ~LeidenException()=default;
 };
 
-inline Id get_random_int(Id from, Id to, igraph_rng_t* rng)
+inline Id get_random_int(Id from, Id to, igraph_rng_t* rng) noexcept
 {
   return igraph_rng_get_integer(rng, from, to);
 };
@@ -109,7 +109,7 @@ class Graph
     //! considering whether the graph is directed
     Id possible_edges(Id n) const noexcept;
 
-    Graph* collapse_graph(MutableVertexPartition* partition);
+    Graph* collapse_graph(MutableVertexPartition* partition) const;
 
     vector<Id> const& get_neighbour_edges(Id v, igraph_neimode_t mode) const noexcept;
     vector<Id> const& get_neighbours(Id v, igraph_neimode_t mode) const;
@@ -117,12 +117,13 @@ class Graph
 
     pair<Id, Id> get_endpoints(Id e) const noexcept;
 
-    inline Id get_random_node(igraph_rng_t* rng)
+    inline Id get_random_node(igraph_rng_t* rng) const noexcept
     {
       return get_random_int(0, this->vcount() - 1, rng);
     };
 
-    inline igraph_t* get_igraph() { return this->_graph; };
+    inline const igraph_t* get_igraph() const noexcept  { return this->_graph; };
+    //inline igraph_t* get_igraph() noexcept  { return this->_graph; };
 
     inline Id vcount() const noexcept  { return igraph_vcount(this->_graph); };
     inline Id ecount() const noexcept { return igraph_ecount(this->_graph); };
